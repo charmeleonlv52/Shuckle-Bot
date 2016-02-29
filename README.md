@@ -7,8 +7,6 @@ Language: Python 3.5.1
 
 Library: discord.py 0.9.2
 
-Uptime: {uptime}
-
 __Commands:__
 
 Show bot description:
