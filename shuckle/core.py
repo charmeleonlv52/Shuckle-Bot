@@ -8,6 +8,18 @@ from time import time
 import traceback
 from util import get_internal
 
+class ShuckleError(Error):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return 'Shuckle Error: {}'.format(self.message)
+
+class ShucklePermissionError(ShuckleError):
+    def __init__(self):
+        super().__init__('Insufficient permission to perform this operation.')
+
+
 class Toolbox(object):
     def __init__(self, base, bots, debug):
         self.start_time = time()
@@ -45,15 +57,16 @@ class Toolbox(object):
                 if not hasattr(method, '_shuckle_command'):
                     continue
 
-                prefix, cmd = method._shuckle_command
+                command = method._shuckle_command
+                prefix = command.prefix
+                cmd = command.command
 
                 if prefix not in self.prefixes:
                     self.prefixes[prefix] = {}
 
                 # Check for namespace collisions
                 if cmd in self.prefixes[prefix]:
-                    print('Error: Found duplicate definition for <{} {}>'.format(prefix, cmd))
-                    sys.exit(0)
+                    raise ShuckleError('Error: Found duplicate definition for <{} {}>'.format(prefix, cmd))
 
                 self.prefixes[prefix][cmd] = method
 
@@ -61,29 +74,29 @@ class Toolbox(object):
         try:
             self._load_bots()
         except:
-            print('Error: Invalid bot found in bots folder')
             if self.__DEBUG__: traceback.print_exc()
-            sys.exit(0)
+            raise ShuckleError('Error: Invalid bot found in bots folder')
 
         print('Bots done loading...')
         print('Shuckle is ready...')
 
         self.client.run(email, password)
 
-    def get_channel(self):
+    @property
+    def channel(self):
         return get_internal('_channel')
 
     async def say(self, message, *args, **kwargs):
-        await self.client.send_message(self.get_channel(), message, *args, **kwargs)
+        await self.client.send_message(self.self.channel, message, *args, **kwargs)
 
     async def upload(self, f, *args, **kwargs):
-        await self.client.send_file(self.get_channel(), f, *args, **kwargs)
+        await self.client.send_file(self.self.channel, f, *args, **kwargs)
 
     async def delete(self, message):
         await self.client.delete_message(message)
 
     def get_history(self, **kwargs):
-        return self.client.logs_from(self.get_channel(), **kwargs)
+        return self.client.logs_from(self.self.channel, **kwargs)
 
     async def help(self, message):
         if any(message.content.startswith(x) for x in ['help', 'about', 'info']):
@@ -104,6 +117,10 @@ class Toolbox(object):
                     message.channel,
                     PERMISSIONS
                 )
+
+    def has_perm(self, user, perm_list):
+        perm = self.channel.permissions_for(user)
+        return all(getattr(perm, x, False) for x in perm_list)
 
     async def on_message(self, message):
         if message.author == self.user:
@@ -132,8 +149,16 @@ class Toolbox(object):
 
                 if prefix in self.prefixes:
                     method = self.prefixes[prefix][command]
+
+                    if not self.has_perm(message.author, method.user_perm):
+                        self.say('You don\'t have permission to use this command. :(')
+                    if not self.has_perm(self.user, method.bot_perm):
+                        raise ShucklePermissionError()
+
                     await method(message)
             except IndexError:
                 pass
+            except ShuckleError e:
+                self.say(e)
             except:
                 traceback.print_exc()

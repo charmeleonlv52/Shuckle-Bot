@@ -165,13 +165,12 @@ class PollBot(object):
         except:
             traceback.print_exc()
 
-    @command('poll', 'delete')
+    @command('poll', 'delete', perm=['manage_messages'])
     async def delete(message):
-        if message.channel.permissions_for(message.author).manage_messages:
-            try:
-                self.polls[message.channel].closed = True
-                del self.polls[message.channel]
-            except:
-                pass
+        try:
+            self.polls[message.channel].closed = True
+            del self.polls[message.channel]
+        except:
+            pass
 
 bot = PollBot
