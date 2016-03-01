@@ -1,5 +1,5 @@
 import asyncio
-from shuckle import command
+from shuckle.command import command
 import humanfriendly
 import json
 import os

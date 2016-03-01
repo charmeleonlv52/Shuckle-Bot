@@ -1,5 +1,5 @@
 from discord import errors
-from shuckle import command
+from shuckle.command import command
 
 # Arbitrarily large number that we
 # will hopefully never reach.
@@ -24,8 +24,6 @@ class ModBot(object):
     # given message.
     async def prune_channel(self, message, func=None, include=False):
         history = self.client.get_history(limit=MAX_INT, before=message)
-
-        print(history)
 
         async for x in history:
             if func is not None and func(x) or func is None:
