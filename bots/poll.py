@@ -1,4 +1,5 @@
 import asyncio
+from shuckle import command
 import humanfriendly
 import json
 import os
@@ -69,108 +70,108 @@ class PollBot(object):
     def __init__(self, client):
         self.client = client
 
-    async def on_message(self, message):
-        MAKE_POLL = 'poll make '
-        DELETE_POLL = 'poll delete'
-        VOTE = 'poll vote '
-
-        if message.content.startswith(MAKE_POLL):
-            # Only one poll per channel
-            if message.channel in self.polls:
-                return
+    @command('poll', 'make')
+    async def make_poll(message):
+        # Only one poll per channel
+        if message.channel in self.polls:
+            return
+        try:
+            # Parse string starting from MAKE_POLL
+            data = ''.join(message.content.split(MAKE_POLL)[1:])
+            
             try:
-                # Parse string starting from MAKE_POLL
-                data = ''.join(message.content.split(MAKE_POLL)[1:])
-                
+                data = json.loads(data)
+            except:
+                # Shorthand
                 try:
-                    data = json.loads(data)
-                except:
-                    # Shorthand
+                    data = data.split(':')
+
                     try:
-                        data = data.split(':')
-
-                        try:
-                            duration = int(humanfriendly.parse_timespan(data[1]))
-                        except:
-                            duration = int(data[1])
-
-                        if self.client.__DEBUG__ and duration > 5 * 60:
-                            return
-
-                        data = {
-                            'title': data[0],
-                            'duration': duration,
-                            'options': data[2:]
-                        }
+                        duration = int(humanfriendly.parse_timespan(data[1]))
                     except:
+                        duration = int(data[1])
+
+                    if self.client.__DEBUG__ and duration > 5 * 60:
                         return
 
-                poll = Poll(data['title'], data['options'])
-                self.polls[message.channel] = poll
-
-                # Create poll message and send it
-                poll_msg = '**POLL: {}** - Ends in {}'.format(
-                    data['title'],
-                    humanfriendly.format_timespan(data['duration'])
-                )
-
-                for x in range(len(data['options'])):
-                    poll_msg += '\n{}. {}'.format(x + 1, data['options'][x])
-
-                await self.client.send_message(message.channel, poll_msg)
-
-                # Sleep for some time
-                await asyncio.sleep(data['duration'])
-
-                if poll.closed:
+                    data = {
+                        'title': data[0],
+                        'duration': duration,
+                        'options': data[2:]
+                    }
+                except:
                     return
 
-                # Get top options and send a message
-                top = self.polls[message.channel].get_top()
+            poll = Poll(data['title'], data['options'])
+            self.polls[message.channel] = poll
 
-                if top is not None:
-                    chart = make_chart(data['title'], top)
+            # Create poll message and send it
+            poll_msg = '**POLL: {}** - Ends in {}'.format(
+                data['title'],
+                humanfriendly.format_timespan(data['duration'])
+            )
 
-                    # Upload chart.
-                    with open(chart, 'rb') as f:
-                        await self.client.send_file(message.channel, f)
+            for x in range(len(data['options'])):
+                poll_msg += '\n{}. {}'.format(x + 1, data['options'][x])
 
-                        try:
-                            os.remove(chart)
-                        except:
-                            pass
-                else:
-                    await self.client.send_message(message.channel, '**POLL: {}** - No Results'.format(data['title']))
+            await self.client.say(poll_msg)
 
-                '''
-                poll_msg = '**POLL: {}** - Results'.format(data['title'])
+            # Sleep for some time
+            await asyncio.sleep(data['duration'])
 
-                for x in range(len(top)):
-                    poll_msg += '\n{}. {} ({})'.format(x + 1, top[x][0], top[x][1])
+            if poll.closed:
+                return
 
-                await self.client.send_message(message.channel, poll_msg)
-                '''
+            # Get top options and send a message
+            top = self.polls[message.channel].get_top()
 
-                # Delete current poll to allow a new one
+            if top is not None:
+                chart = make_chart(data['title'], top)
+
+                # Upload chart.
+                with open(chart, 'rb') as f:
+                    await self.client.upload(f)
+
+                    try:
+                        os.remove(chart)
+                    except:
+                        pass
+            else:
+                await self.client.say('**POLL: {}** - No Results'.format(data['title']))
+
+            '''
+            poll_msg = '**POLL: {}** - Results'.format(data['title'])
+
+            for x in range(len(top)):
+                poll_msg += '\n{}. {} ({})'.format(x + 1, top[x][0], top[x][1])
+
+            await self.client.say(poll_msg)
+            '''
+
+            # Delete current poll to allow a new one
+            del self.polls[message.channel]
+        except:
+            traceback.print_exc()
+
+    @command('poll', 'vote')
+    async def vote(message):
+        # Check to see if there's even a poll to vote on
+        if not message.channel in self.polls:
+            return
+        try:
+            # Get vote option
+            option = int(message.content.split(VOTE)[1])
+            self.polls[message.channel].vote(option, message.author.id)
+        except:
+            traceback.print_exc()
+
+    @command('poll', 'delete')
+    async def delete(message):
+        if message.channel.permissions_for(message.author).manage_messages:
+            try:
+                self.polls[message.channel].closed = True
                 del self.polls[message.channel]
             except:
-                traceback.print_exc()
-        elif message.content.startswith(VOTE):
-            # Check to see if there's even a poll to vote on
-            if not message.channel in self.polls:
-                return
-            try:
-                # Get vote option
-                option = int(message.content.split(VOTE)[1])
-                self.polls[message.channel].vote(option, message.author.id)
-            except:
-                traceback.print_exc()
-        elif message.content.startswith(DELETE_POLL):
-            if message.channel.permissions_for(message.author).manage_messages:
-                try:
-                    self.polls[message.channel].closed = True
-                    del self.polls[message.channel]
-                except:
-                    pass
+                pass
 
 bot = PollBot
