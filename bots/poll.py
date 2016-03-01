@@ -1,7 +1,38 @@
 import asyncio
 import humanfriendly
 import json
+import os
+import pygal
+from pygal.style import Style
+import time
 import traceback
+
+DiscordStyle = Style(
+    background='#ffffff',
+    plot_background='#ffffff',
+    font_family='Open Sans',
+    foreground='#546e7a',
+    foreground_strong='#546e7a',
+    foreground_subtle='#546e7a',
+    colors=('#738bd7', '#1abc9c', '#3498db', '#e91e63', '#f1c40f')
+)
+
+def make_chart(title, values):
+    chart = pygal.Pie(
+        title=title,
+        legend_at_bottom=True,
+        style=DiscordStyle
+    )
+
+    for value in values:
+        chart.add('{} ({})'.format(value[0], value[1]), value[1])
+
+    now = time.time()
+    path = '/tmp/{}.png'.format(now)
+
+    chart.render_to_png(path)
+
+    return path
 
 class Poll(object):
     def __init__(self, title, options):
@@ -19,10 +50,17 @@ class Poll(object):
         for x in self.votes:
             results[self.votes[x] - 1] += 1
 
+        if sum(results) == 0:
+            return None
+
         return zip(self.options, results)
 
     def get_top(self):
         results = self.get_results()
+
+        if results is None:
+            return None
+
         return sorted(results, key=lambda x: x[1], reverse=True)
 
 class PollBot(object):
@@ -90,12 +128,28 @@ class PollBot(object):
                 # Get top options and send a message
                 top = self.polls[message.channel].get_top()
 
+                if top is not None:
+                    chart = make_chart(data['title'], top)
+
+                    # Upload chart.
+                    with open(chart, 'rb') as f:
+                        await self.client.send_file(message.channel, f)
+
+                        try:
+                            os.remove(chart)
+                        except:
+                            pass
+                else:
+                    await self.client.send_message(message.channel, '**POLL: {}** - No Results'.format(data['title']))
+
+                '''
                 poll_msg = '**POLL: {}** - Results'.format(data['title'])
 
                 for x in range(len(top)):
                     poll_msg += '\n{}. {} ({})'.format(x + 1, top[x][0], top[x][1])
 
                 await self.client.send_message(message.channel, poll_msg)
+                '''
 
                 # Delete current poll to allow a new one
                 del self.polls[message.channel]

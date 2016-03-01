@@ -1,4 +1,4 @@
-from config import BOTS_FOLDER, DESCRIPTION
+from config import BOTS_FOLDER, COMMANDS, DESCRIPTION, PERMISSIONS
 from discord import Client
 import humanfriendly
 import os
@@ -51,13 +51,24 @@ class Toolbox(Client):
 
     async def help(self, message):
         if any(message.content.startswith(x) for x in ['help', 'about', 'info']):
-            await self.send_message(
-                message.channel,
-                DESCRIPTION.format(
-                    bot_name=self.user.name,
-                    uptime=humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+            if any(message.content == x for x in ['help', 'about', 'info']):
+                await self.send_message(
+                    message.channel,
+                    DESCRIPTION.format(
+                        bot_name=self.user.name,
+                        uptime=humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+                    )
                 )
-            )
+            elif message.content.endswith('commands'):
+                await self.send_message(
+                    message.channel,
+                    COMMANDS.format(bot_name=self.user.name)
+                )
+            elif message.content.endswith('permissions'):
+                await self.send_message(
+                    message.channel,
+                    PERMISSIONS
+                )
 
     async def on_message(self, message):
         mention = any([m == client.user for m in message.mentions])
