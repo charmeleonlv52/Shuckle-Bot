@@ -15,7 +15,7 @@ class Toolbox(object):
         self.__DEBUG__ = debug
         self.__BASE__ = base
         self.__BOTS__ = bots
-        
+
         self.prefixes = {}
         self.client = Client()
         self.user = None
@@ -62,10 +62,11 @@ class Toolbox(object):
             self._load_bots()
         except:
             print('Error: Invalid bot found in bots folder')
-            traceback.print_exc()
+            if self.__DEBUG__: traceback.print_exc()
             sys.exit(0)
 
-        print('Bots Done Loading...')
+        print('Bots done loading...')
+        print('Shuckle is ready...')
 
         self.client.run(email, password)
 
@@ -121,8 +122,6 @@ class Toolbox(object):
                 message.content = message.clean_content.replace('@{} '.format(self.user), '', 1)
             else:
                 message.content = message.clean_content.replace('~', '', 1)
-
-            print(message.content)
 
             await self.help(message)
 

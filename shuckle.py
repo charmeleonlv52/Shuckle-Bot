@@ -27,7 +27,7 @@ client = Toolbox(base=__BASE__, bots=__BOTS__, debug=__DEBUG__)
 
 if __name__ == '__main__':
     print('Starting up...')
-    print('Debug Status: {}'.format(__DEBUG__))
+    print('Debug status: {}'.format(__DEBUG__))
     print('Using user: ' + secrets.email)
 
     client.run(secrets.email, secrets.password)
