@@ -1,16 +1,22 @@
 from datetime import datetime
 from discord import errors
+import os
 from shuckle.command import command
+import time
 
 # Arbitrarily large number that we
 # will hopefully never reach.
 MAX_INT = 99999999999999999999
+# 15 megabytes
+MAX_ATTACHMENT = 15 * 1024 * 1024
 
 class ModBot(object):
+    __group__ = 'mod'
+
     def __init__(self, client):
         self.client = client
 
-    @command('mod', 'clear', perm=['manage_messages'])
+    @command('clear', perm=['manage_messages'])
     async def clear(self, message):
         await self.prune_channel(message, include=True)
 
@@ -29,19 +35,29 @@ class ModBot(object):
 
     # Archives an entire channel to a text file
     # and sends it to the calling user.
-    @command('mod', 'archive', perm=['manage_messages', 'read_message_history'])
+    @command('archive', perm=['manage_messages', 'read_message_history'])
     async def archive_channel(self, message):
         history = self.client.get_history(limit=MAX_INT, before=message)
-        now = datetime.utcnow()
-        path = '/tmp/{}.txt'.format(now)
+        now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
+        path = os.path.join('/tmp', '{}.txt'.format(time.time()))
+
+        size = 0
 
         with open(path, 'w+') as f:
             async for x in history:
-                f.write(str(x) + '\n')
+                out = '[{}] {}: {}\n'.format(x.timestamp, x.author.name, x.clean_content)
 
+                if size + len(out) > MAX_ATTACHMENT:
+                    break
+
+                f.write(out)
             f.flush()
 
-            await self.client.upload(message.author, f, filename='{} {}'.format(message.channel, now))
+        channel = str(message.channel).replace(' ', '-')
+        server = str(message.server).replace(' ', '-')
+
+        with open(path, 'rb') as f:
+            await self.client.client.send_file(message.author, f, filename='{}.{}-{}.txt'.format(server, channel, now))
 
         os.remove(path)
 

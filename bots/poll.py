@@ -29,7 +29,7 @@ def make_chart(title, values):
         chart.add('{} ({})'.format(value[0], value[1]), value[1])
 
     now = time.time()
-    path = '/tmp/{}.png'.format(now)
+    path = os.path.join('tmp', '{}.png'.format(now))
 
     chart.render_to_png(path)
 
@@ -65,20 +65,20 @@ class Poll(object):
         return sorted(results, key=lambda x: x[1], reverse=True)
 
 class PollBot(object):
+    __group__ = 'poll'
     polls = {}
 
     def __init__(self, client):
         self.client = client
 
-    @command('poll', 'make')
-    async def make_poll(message):
+    @command(bot_perm=['attach_files'])
+    async def make(self, message):
         # Only one poll per channel
         if message.channel in self.polls:
             return
         try:
-            # Parse string starting from MAKE_POLL
-            data = ''.join(message.content.split(MAKE_POLL)[1:])
-            
+            data = message.content
+
             try:
                 data = json.loads(data)
             except:
@@ -153,8 +153,8 @@ class PollBot(object):
         except:
             traceback.print_exc()
 
-    @command('poll', 'vote')
-    async def vote(message):
+    @command
+    async def vote(self, message):
         # Check to see if there's even a poll to vote on
         if not message.channel in self.polls:
             return
@@ -165,8 +165,8 @@ class PollBot(object):
         except:
             traceback.print_exc()
 
-    @command('poll', 'delete', perm=['manage_messages'])
-    async def delete(message):
+    @command(perm=['manage_messages'])
+    async def delete(self, message):
         try:
             self.polls[message.channel].closed = True
             del self.polls[message.channel]
