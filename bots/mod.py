@@ -5,7 +5,7 @@ class ModBot(object):
     # Deletes all previous messages in a specified
     # channel given a message. Does not delete the
     # given message.
-    async def prune_channel(self, message):
+    async def prune_channel(self, message, include=False):
         deleted = True
 
         async def delete_messages():
@@ -17,10 +17,12 @@ class ModBot(object):
             deleted = False
             await delete_messages()
 
+        if include:
+            await self.client.delete_message(message)
+
     async def on_message(self, message):
         if message.content.startswith('mod clear'):
             if message.channel.permissions_for(message.author).manage_messages:
-                await self.prune_channel(message)
-                await self.client.delete_message(message)
+                await self.prune_channel(message, include=True)
 
 bot = ModBot

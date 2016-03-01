@@ -35,6 +35,7 @@ Deletes all messages in a channel (requires the ability to manage messages and r
 ```
 @{bot_name} mod clear
 ```
+Note: The leading character "~" may be substituted for "@{bot_name}".
 """
 
 BOTS_FOLDER = 'bots'

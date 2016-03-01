@@ -60,9 +60,14 @@ class Toolbox(Client):
             )
 
     async def on_message(self, message):
-        if any([m == client.user for m in message.mentions]):
-            # Remove initial "@bot_name "
-            message.content = message.clean_content.replace('@{} '.format(self.user.name), '')
+        mention = any([m == client.user for m in message.mentions])
+
+        if mention or message.content.startswith('~'):
+            if mention:
+                # Remove initial "@bot_name "
+                message.content = message.clean_content.replace('@{} '.format(self.user.name), '', 1)
+            else:
+                message.content = message.clean_content.replace('~', '', 1)
 
             await self.help(message)
 
