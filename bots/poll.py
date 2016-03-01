@@ -109,7 +109,7 @@ class PollBot(object):
                 self.polls[message.channel] = poll
 
                 # Create poll message and send it
-                poll_msg = '**POLL: {}** - {}'.format(
+                poll_msg = '**POLL: {}** - Ends in {}'.format(
                     data['title'],
                     humanfriendly.format_timespan(data['duration'])
                 )
