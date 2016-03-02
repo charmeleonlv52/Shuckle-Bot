@@ -5,12 +5,17 @@ Language: Python 3.5.1
 Library: discord.py 0.9.2
 Uptime: {uptime}
 
-For a list of commands use: `@{bot_name} info|help|about commands`
-For a permission legend use: `@{bot_name} info|help|about permissions`
+Shuckle combines many small bots into one super bot!
+
+__Installed Bots:__
+{bot_list}
+
+Want bot specific information? Use: `@{bot_name} info|help|about <bot_name>`
+Want to see the permission glossery? Use: `@{bot_name} info|help|about permissions`
 """
 
-COMMANDS = """
-__Commands:__
+POLL = """
+__Poll Commands:__
 
 Show bot description:
 ```
@@ -36,6 +41,11 @@ Delete the current poll and don't show the results [U:MM]:
 ```
 @{bot_name} poll delete
 ```
+"""
+
+MOD = """
+__Mod Commands:__
+
 Deletes all messages in a channel (potentially slow) [B:MM/B:H/U:MM/U:H]:
 ```
 @{bot_name} mod clear
@@ -44,7 +54,6 @@ Saves all previous messages in text file and sends it to the user (maximum of 15
 ```
 @{bot_name} mod archive
 ```
-Note: The leading character "~" may be substituted for "@{bot_name}".
 """
 
 PERMISSIONS = """
@@ -63,5 +72,6 @@ BOTS_FOLDER = 'bots'
 # DO NOT TOUCH ANYTHING BELOW
 
 DESCRIPTION = DESCRIPTION.strip()
-COMMANDS = COMMANDS.strip()
+POLL = POLL.strip()
+MOD = MOD.strip()
 PERMISSIONS = PERMISSIONS.strip()

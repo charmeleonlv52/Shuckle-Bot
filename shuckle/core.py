@@ -124,7 +124,9 @@ class Toolbox(object):
             await self.say(
                 DESCRIPTION.format(
                     bot_name=self.user.name,
-                    uptime=humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+                    uptime=humanfriendly.format_timespan(time() - self.start_time, detailed=False),
+                    bot_list=', '.join(sorted(self.commands.keys())),
+                    prefix=self.__PREFIX__
                 )
             )
 

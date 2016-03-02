@@ -1,12 +1,8 @@
-from config import BOTS_FOLDER, COMMANDS, DESCRIPTION, PERMISSIONS, PREFIX
+from config import BOTS_FOLDER, PREFIX
 from discord import Client
-import humanfriendly
-import inspect
 import os
 from secrets import secrets
 import sys
-from time import time
-import traceback
 
 if '--debug' in sys.argv:
     __DEBUG__ = True

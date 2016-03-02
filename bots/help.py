@@ -1,4 +1,4 @@
-from config import COMMANDS, PERMISSIONS
+from config import MOD, PERMISSIONS, POLL
 from shuckle.command import command
 
 class GeneralBot(object):
@@ -8,9 +8,15 @@ class GeneralBot(object):
         self.client = client
 
     @command
-    async def commands(self, message):
+    async def poll(self, message):
         await self.client.say(
-            COMMANDS.format(bot_name=self.client.user.name)
+            POLL.format(bot_name=self.client.user.name)
+        )
+
+    @command
+    async def mod(self, message):
+        await self.client.say(
+            MOD.format(bot_name=self.client.user.name)
         )
 
     @command

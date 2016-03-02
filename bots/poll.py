@@ -123,7 +123,7 @@ class PollBot(object):
                 return
 
             # Get top options and send a message
-            top = self.polls[message.channel].get_top()
+            top = poll.get_top()
 
             if top is not None:
                 chart = make_chart(data['title'], top)
