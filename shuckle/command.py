@@ -1,3 +1,19 @@
+def parse_cmd(content):
+    tokens = content.split(' ')
+    group = tokens[0]
+
+    try:
+        cmd = tokens[1]
+    except:
+        cmd = None
+
+    try:
+        args = ' '.join(tokens[2:])
+    except:
+        args = None
+
+    return group, cmd, args
+
 class Command(object):
     def __init__(self, cmd, func, perm=[], user_perm=[], bot_perm=[]):
         self.cmd = cmd
@@ -21,17 +37,8 @@ class Template(object):
         self.author = message.author
         self.channel = message.channel
         self.server = message.server
-        self.group = tokens[0]
 
-        try:
-            self.cmd = tokens[1]
-        except:
-            self.cmd = None
-
-        try:
-            self.args = ' '.join(tokens[2:])
-        except:
-            self.args = None
+        self.group, self.cmd, self.args = parse_cmd(content)
 
 def command(cmd=None, perm=[], user_perm=[], bot_perm=[]):
     if cmd is not None and hasattr(cmd, '__call__'):

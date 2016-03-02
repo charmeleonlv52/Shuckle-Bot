@@ -20,6 +20,18 @@ class ModBot(object):
     async def clear(self, message):
         await self.prune_channel(message, include=True)
 
+    @command(perm=['manage_messages'])
+    async def prune(self, message):
+        mentions = message.raw_message.mentions
+
+        if self.client.iden == self.client.user:
+            mentions = [x for x in mentions if x != self.client.user]
+
+        await self.prune_channel(
+            message,
+            func=lambda x: x.author in mentions
+        )
+
     # Deletes all previous messages in a specified
     # channel given a message. Does not delete the
     # given message.
@@ -62,5 +74,8 @@ class ModBot(object):
 
         os.remove(path)
 
+        # Assume that the user does not want the archive command
+        # kept in chat.
+        await self.client.delete(message.raw_message)
 
 bot = ModBot

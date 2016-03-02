@@ -1,5 +1,9 @@
 from shuckle.command import command
 
+# An example bot with the following usage:
+# 	@<bot name> example hello
+# 	>hello <your name>
+
 class Example(object):
 	__group__ = 'example'
 
@@ -7,7 +11,7 @@ class Example(object):
 		self.client = client
 
 	@command
-	async def say_hi():
-		await self.client.say('hi')
+	async def hello(self, message):
+		await self.client.say('hello {}'.format(message.author))
 
 bot = Example

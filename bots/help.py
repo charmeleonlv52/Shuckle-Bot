@@ -10,13 +10,13 @@ class GeneralBot(object):
     @command
     async def poll(self, message):
         await self.client.say(
-            POLL.format(bot_name=self.client.user.name)
+            POLL.format(bot_name=self.client.user.mention)
         )
 
     @command
     async def mod(self, message):
         await self.client.say(
-            MOD.format(bot_name=self.client.user.name)
+            MOD.format(bot_name=self.client.user.mention)
         )
 
     @command

@@ -7,20 +7,16 @@ Uptime: {uptime}
 
 Shuckle combines many small bots into one super bot!
 
-__Installed Bots:__
+__Installed Modules:__
 {bot_list}
 
-Want bot specific information? Use: `@{bot_name} info|help|about <bot_name>`
+Want bot specific information? Use: `@{bot_name} info|help|about <module>`
 Want to see the permission glossery? Use: `@{bot_name} info|help|about permissions`
 """
 
 POLL = """
 __Poll Commands:__
 
-Show bot description:
-```
-@{bot_name} info|help|about
-```
 Create a new poll in the current channel:
 ```
 @{bot_name} poll make {{
@@ -50,9 +46,13 @@ Deletes all messages in a channel (potentially slow) [B:MM/B:H/U:MM/U:H]:
 ```
 @{bot_name} mod clear
 ```
-Saves all previous messages in text file and sends it to the user (maximum of 15 MB; potentially slow) [B:MM/B:H/U:MM/U:H]
+Saves all previous messages in a text file and sends it to the user (15 MB max archive size; potentially slow) [B:MM/B:H/U:MM/U:H]
 ```
 @{bot_name} mod archive
+```
+Prunes all messages by a user [B:MM/U:MM]:
+```
+@{bot_name} mod prune <@user>
 ```
 """
 
@@ -65,6 +65,14 @@ MM - Manage messages
 H - View message history
 """
 
+STATS_DETAIL = """
+__Stats for Geeks__
+Uptime: {uptime}
+Total Memory: {total_mem}
+Used Memory: {used_mem}
+Connected Servers: {server_count}
+"""
+
 PREFIX = '~'
 
 BOTS_FOLDER = 'bots'
@@ -75,3 +83,4 @@ DESCRIPTION = DESCRIPTION.strip()
 POLL = POLL.strip()
 MOD = MOD.strip()
 PERMISSIONS = PERMISSIONS.strip()
+STATS_DETAIL = STATS_DETAIL.strip()

@@ -18,7 +18,7 @@ class ShuckleError(Exception):
 
 class ShucklePermissionError(ShuckleError):
     def __init__(self):
-        super().__init__('Insufficient permission to perform this operation.')
+        super().__init__('I don\'t have permission to do this.')
 
 class Toolbox(object):
     def __init__(self, base, bots, prefix=None, debug=False):
@@ -91,7 +91,10 @@ class Toolbox(object):
             raise ShuckleError('Invalid bot found in bots folder')
 
         print('Bots done loading...')
-        print('Shuckle is ready...')
+
+        if self.__DEBUG__: print(self.commands)
+
+        print('Shuckle is starting...')
 
         self.client.run(email, password)
 
@@ -99,14 +102,29 @@ class Toolbox(object):
     def channel(self):
         return get_internal('_channel')
 
+    @property
+    def uptime(self):
+        return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+
+    @property
+    def iden(self):
+        return get_internal('_iden')
+    
+
     async def say(self, message, *args, **kwargs):
         await self.client.send_message(self.channel, message, *args, **kwargs)
+
+    async def tell(self, *args, **kwargs):
+        await self.client.send_message(get_internal('_author'), *args, **kwargs)
 
     async def upload(self, f, *args, **kwargs):
         await self.client.send_file(self.channel, f, *args, **kwargs)
 
-    async def delete(self, message):
-        await self.client.delete_message(message)
+    async def delete(self, *args, **kwargs):
+        await self.client.delete_message(*args, **kwargs)
+
+    async def edit(self, *args, **kwargs):
+        await self.client.edit_message(*args, **kwargs)
 
     def get_history(self, **kwargs):
         return self.client.logs_from(self.channel, **kwargs)
@@ -124,7 +142,7 @@ class Toolbox(object):
             await self.say(
                 DESCRIPTION.format(
                     bot_name=self.user.name,
-                    uptime=humanfriendly.format_timespan(time() - self.start_time, detailed=False),
+                    uptime=self.uptime,
                     bot_list=', '.join(sorted(self.commands.keys())),
                     prefix=self.__PREFIX__
                 )
@@ -133,17 +151,27 @@ class Toolbox(object):
     # Ready event handler
     async def on_ready(self):
         self.user = self.client.user
+        self.server_count = 0
+
+        for x in self.client.servers:
+            self.server_count += 1
+
+        print('Shuckle is online...')
 
     # on_message event handler
     async def on_message(self, message):
         if message.author == self.user:
             return
 
-        mention = any([m == self.client.user for m in message.mentions])
+        mention_text = '@{} '.format(self.user.name)
+        mention = message.clean_content.startswith(mention_text)
 
         if mention or message.content.startswith(self.__PREFIX__):
             _channel = message.channel
-            template = Template(message, '@{} '.format(self.user.name) if mention else self.__PREFIX__)
+            _author = message.author
+            _iden = self.user if mention else self.__PREFIX__
+
+            template = Template(message, mention_text if mention else self.__PREFIX__)
 
             await self.help(template)
 
@@ -155,14 +183,16 @@ class Toolbox(object):
                         self.say('You don\'t have permission to use this command. :(')
 
                     try:
+                        print(template.group, template.cmd)
                         await command.run(template)
                     except errors.Forbidden:
                         raise ShucklePermissionError()
             except IndexError:
                 pass
             except KeyError:
+                if self.__DEBUG__: traceback.print_exc()
                 pass
             except ShuckleError as e:
-                self.say(e)
+                await self.say(e)
             except:
                 traceback.print_exc()
