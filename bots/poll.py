@@ -18,6 +18,31 @@ DiscordStyle = Style(
     colors=('#738bd7', '#1abc9c', '#3498db', '#e91e63', '#f1c40f')
 )
 
+HELP = """
+__Poll Commands:__
+
+Create a new poll in the current channel:
+```
+@{bot_name} poll make {{
+    "title": <string>,
+    "duration": <integer|seconds>,
+    "options": [<string>]
+}}
+```
+Shorthand for the above (does not support colons in options):
+```
+@{bot_name} poll make <title>:<duration>:<option>[:<option>]
+```
+Cast your vote for the current poll:
+```
+@{bot_name} poll vote <integer>
+```
+Delete the current poll and don't show the results [U:MM]:
+```
+@{bot_name} poll delete
+```
+"""
+
 def make_chart(title, values):
     chart = pygal.Pie(
         title=title,
@@ -71,7 +96,11 @@ class PollBot(object):
     def __init__(self, client):
         self.client = client
 
-    @command(bot_perm=['attach_files'])
+    @command
+    async def help(self, message):
+        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+
+    @command
     async def make(self, message):
         # Only one poll per channel
         if message.channel in self.polls:
@@ -85,11 +114,7 @@ class PollBot(object):
                 # Shorthand
                 try:
                     data = data.split(':')
-
-                    try:
-                        duration = int(humanfriendly.parse_timespan(data[1]))
-                    except:
-                        duration = int(data[1])
+                    duration = int(humanfriendly.parse_timespan(data[1]))
 
                     if self.client.__DEBUG__ and duration > 5 * 60:
                         return

@@ -1,3 +1,5 @@
+import json
+
 def parse_cmd(content):
     tokens = content.split(' ')
     group = tokens[0]
@@ -15,18 +17,19 @@ def parse_cmd(content):
     return group, cmd, args
 
 class Command(object):
-    def __init__(self, cmd, func, perm=[], user_perm=[], bot_perm=[]):
+    def __init__(self, cmd, func, perm=[]):
         self.cmd = cmd
         self.func = func
-        self.user_perm = user_perm
-        self.bot_perm = bot_perm
-
-        for x in perm:
-            self.user_perm.append(x)
-            self.bot_perm.append(x)
+        self.user_perm = perm
 
     async def run(self, message):
         await self.func(message)
+
+    def __repr__(self):
+        return json.dumps({
+            'cmd': self.cmd,
+            'user_perm': self.user_perm
+        })
 
 class Template(object):
     def __init__(self, message, iden):
@@ -40,10 +43,10 @@ class Template(object):
 
         self.group, self.cmd, self.args = parse_cmd(content)
 
-def command(cmd=None, perm=[], user_perm=[], bot_perm=[]):
+def command(cmd=None, perm=[]):
     if cmd is not None and hasattr(cmd, '__call__'):
         command = cmd.__name__
-        cmd._shuckle_command = Command(command, cmd, perm, user_perm, bot_perm)
+        cmd._shuckle_command = Command(command, cmd, perm)
 
         return cmd
 
@@ -53,6 +56,6 @@ def command(cmd=None, perm=[], user_perm=[], bot_perm=[]):
         else:
             command = cmd
 
-        func._shuckle_command = Command(command, func, perm, user_perm, bot_perm)
+        func._shuckle_command = Command(command, func, perm)
         return func
     return dec

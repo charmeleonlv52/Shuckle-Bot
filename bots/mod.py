@@ -1,5 +1,5 @@
+import asyncio
 from datetime import datetime
-from discord import errors
 import os
 from shuckle.command import command
 import time
@@ -10,15 +10,36 @@ MAX_INT = 99999999999999999999
 # 15 megabytes
 MAX_ATTACHMENT = 15 * 1024 * 1024
 
+HELP = """
+__Mod Commands:__
+
+Deletes all messages in a channel (potentially slow) [B:MM/B:H/U:MM/U:H]:
+```
+@{bot_name} mod clear
+```
+Saves all previous messages in a text file and sends it to the user (15 MB max archive size; potentially slow) [B:MM/B:H/U:MM/U:H]
+```
+@{bot_name} mod archive
+```
+Prunes all messages by a user [B:MM/U:MM]:
+```
+@{bot_name} mod prune <@user>
+```
+"""
+
 class ModBot(object):
     __group__ = 'mod'
 
     def __init__(self, client):
         self.client = client
 
-    @command('clear', perm=['manage_messages'])
+    @command
+    async def help(self, message):
+        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+
+    @command(perm=['manage_messages'])
     async def clear(self, message):
-        await self.prune_channel(message, include=True)
+        await self.prune_channel(message)
 
     @command(perm=['manage_messages'])
     async def prune(self, message):
@@ -35,16 +56,13 @@ class ModBot(object):
     # Deletes all previous messages in a specified
     # channel given a message. Does not delete the
     # given message.
-    async def prune_channel(self, message, func=None, include=False):
+    async def prune_channel(self, message, func=None):
         message = message.raw_message
-        history = self.client.get_history(limit=MAX_INT, before=message)
+        history = self.client.get_history(limit=MAX_INT)
 
         async for x in history:
             if func is not None and func(x) or func is None:
                 await self.client.delete(x)
-
-        if include:
-            await self.client.delete(message)
 
     # Archives an entire channel to a text file
     # and sends it to the calling user.
@@ -70,12 +88,11 @@ class ModBot(object):
         server = str(message.server).replace(' ', '-')
 
         with open(path, 'rb') as f:
-            await self.client.client.send_file(message.author, f, filename='{}.{}-{}.txt'.format(server, channel, now))
+            filename = '{}.{}-{}.txt'.format(server, channel, now)
+            content = 'Here is the archive you requested:'
+
+            await self.client.attach(message.author, f, content=content, filename=filename)
 
         os.remove(path)
-
-        # Assume that the user does not want the archive command
-        # kept in chat.
-        await self.client.delete(message.raw_message)
 
 bot = ModBot

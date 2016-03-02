@@ -39,6 +39,8 @@ class Toolbox(object):
     def _try_load(self, bot):
         if not hasattr(bot, '__group__'):
             return
+        if hasattr(bot, '__disabled__') and bot.__disabled__:
+            return
 
         prefix = bot.__group__
 
@@ -105,12 +107,7 @@ class Toolbox(object):
     @property
     def uptime(self):
         return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
-
-    @property
-    def iden(self):
-        return get_internal('_iden')
     
-
     async def say(self, message, *args, **kwargs):
         await self.client.send_message(self.channel, message, *args, **kwargs)
 
@@ -126,6 +123,9 @@ class Toolbox(object):
     async def edit(self, *args, **kwargs):
         await self.client.edit_message(*args, **kwargs)
 
+    async def attach(self, *args, **kwargs):
+        await self.client.send_file(*args, **kwargs)
+
     def get_history(self, **kwargs):
         return self.client.logs_from(self.channel, **kwargs)
 
@@ -133,13 +133,45 @@ class Toolbox(object):
         perm = self.channel.permissions_for(user)
         return all(getattr(perm, x, False) for x in perm_list)
 
+    async def exec_command(self, template):
+        _channel = template.channel
+        _author = template.author
+
+        message = template.raw_message
+
+        try:
+            if template.group in self.commands:
+                command = self.commands[template.group][template.cmd]
+
+                if not self.has_perm(message.author, command.user_perm):
+                    print(command.user_perm)
+                    await self.say('You don\'t have permission to use this command.')
+
+                try:
+                    await command.run(template)
+                except errors.Forbidden:
+                    raise ShucklePermissionError()
+        except IndexError:
+            pass
+        except KeyError:
+            pass
+        except ShuckleError as e:
+            if self.__DEBUG__: traceback.print_exc()
+            await self.say(e)
+        except:
+            traceback.print_exc()
+
     # Display Shuckle help information.
     async def help(self, message):
         if message.cmd is not None:
             return
 
         if any(message.group == x for x in ['help', 'about', 'info']):
-            await self.say(
+            # self.say not used because _channel
+            # is set in exec_command. help by itself
+            # is not invoked through exec_command.
+            await self.client.send_message(
+                message.channel,
                 DESCRIPTION.format(
                     bot_name=self.user.name,
                     uptime=self.uptime,
@@ -167,32 +199,7 @@ class Toolbox(object):
         mention = message.clean_content.startswith(mention_text)
 
         if mention or message.content.startswith(self.__PREFIX__):
-            _channel = message.channel
-            _author = message.author
-            _iden = self.user if mention else self.__PREFIX__
-
             template = Template(message, mention_text if mention else self.__PREFIX__)
 
             await self.help(template)
-
-            try:
-                if template.group in self.commands:
-                    command = self.commands[template.group][template.cmd]
-
-                    if not self.has_perm(message.author, command.user_perm):
-                        self.say('You don\'t have permission to use this command. :(')
-
-                    try:
-                        print(template.group, template.cmd)
-                        await command.run(template)
-                    except errors.Forbidden:
-                        raise ShucklePermissionError()
-            except IndexError:
-                pass
-            except KeyError:
-                if self.__DEBUG__: traceback.print_exc()
-                pass
-            except ShuckleError as e:
-                await self.say(e)
-            except:
-                traceback.print_exc()
+            await self.exec_command(template)

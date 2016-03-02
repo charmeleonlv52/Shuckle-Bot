@@ -1,7 +1,22 @@
-from config import STATS_DETAIL
 from humanfriendly import format_size
 from psutil import virtual_memory
 from shuckle.command import command
+
+HELP = """
+__Stats Commands:__
+Show stats for geeks:
+```
+@{bot_name} stats show
+```
+"""
+
+STATS_DETAIL = """
+__Stats for Geeks:__
+Uptime: {uptime}
+Total Memory: {total_mem}
+Used Memory: {used_mem}
+Connected Servers: {server_count}
+"""
 
 class StatBot(object):
     __group__ = ['stats']
@@ -10,12 +25,16 @@ class StatBot(object):
         self.client = client
 
     @command
+    async def help(self, message):
+        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+
+    @command
     async def show(self, message):
         used_mem = virtual_memory().used
         total_mem = virtual_memory().total
 
         await self.client.say(
-            STATS_DETAIL.format(
+            STATS_DETAIL.strip().format(
                 uptime=self.client.uptime,
                 used_mem=format_size(used_mem),
                 total_mem=format_size(total_mem),

@@ -1,23 +1,12 @@
-from config import MOD, PERMISSIONS, POLL
+from config import PERMISSIONS
 from shuckle.command import command
 
 class GeneralBot(object):
     __group__ = ['help', 'info', 'about']
+    __disabled__ = False
 
     def __init__(self, client):
         self.client = client
-
-    @command
-    async def poll(self, message):
-        await self.client.say(
-            POLL.format(bot_name=self.client.user.mention)
-        )
-
-    @command
-    async def mod(self, message):
-        await self.client.say(
-            MOD.format(bot_name=self.client.user.mention)
-        )
 
     @command
     async def permissions(self, message):
