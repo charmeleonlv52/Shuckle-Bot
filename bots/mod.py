@@ -43,7 +43,7 @@ class ModBot(object):
 
     @command(perm=['manage_messages'])
     async def prune(self, message):
-        mentions = message.raw_message.mentions
+        mentions = message.mentions
 
         if self.client.iden == self.client.user:
             mentions = [x for x in mentions if x != self.client.user]
@@ -57,7 +57,6 @@ class ModBot(object):
     # channel given a message. Does not delete the
     # given message.
     async def prune_channel(self, message, func=None):
-        message = message.raw_message
         history = self.client.get_history(limit=MAX_INT)
 
         async for x in history:
@@ -68,7 +67,7 @@ class ModBot(object):
     # and sends it to the calling user.
     @command('archive', perm=['manage_messages', 'read_message_history'])
     async def archive_channel(self, message):
-        history = self.client.get_history(limit=MAX_INT, before=message.raw_message)
+        history = self.client.get_history(limit=MAX_INT)
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
         path = os.path.join('/tmp', '{}.txt'.format(time.time()))
 

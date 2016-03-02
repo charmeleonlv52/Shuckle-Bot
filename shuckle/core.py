@@ -63,7 +63,7 @@ class Toolbox(object):
 
                 # Check for namespace collisions
                 if cmd in self.commands[x]:
-                    raise ShuckleError('Error: Found duplicate definition for <{} {}>'.format(x, cmd))
+                    raise ShuckleError('Error: Found duplicate definition for <{}.{}>'.format(x, cmd))
 
                 command.func = method
                 self.commands[x][cmd] = command
@@ -134,10 +134,14 @@ class Toolbox(object):
         return all(getattr(perm, x, False) for x in perm_list)
 
     async def exec_command(self, template):
+        # Internal variables are set here because
+        # asyncio loops run separate to our stack.
+        #
+        # This means get_internal will not find
+        # these variables if we declare and define them
+        # in on_message.
         _channel = template.channel
         _author = template.author
-
-        message = template.raw_message
 
         try:
             if template.group in self.commands:

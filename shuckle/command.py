@@ -1,5 +1,17 @@
 import json
 
+'''
+Shuckle commands are space delimited.
+'''
+
+'''
+Parses a string as a command.
+
+Returns:
+    - group
+    - cmd
+    - args
+'''
 def parse_cmd(content):
     tokens = content.split(' ')
     group = tokens[0]
@@ -40,6 +52,7 @@ class Template(object):
         self.author = message.author
         self.channel = message.channel
         self.server = message.server
+        self.mentions = message.mentions
 
         self.group, self.cmd, self.args = parse_cmd(content)
 
