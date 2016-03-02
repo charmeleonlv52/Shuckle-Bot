@@ -12,6 +12,27 @@ class Command(object):
     async def run(self, message):
         await self.func(message)
 
+class Template(object):
+    def __init__(self, message, iden):
+        content = message.clean_content.replace(iden, '', 1)
+        tokens = content.split(' ')
+
+        self.raw_message = message
+        self.author = message.author
+        self.channel = message.channel
+        self.server = message.server
+        self.group = tokens[0]
+
+        try:
+            self.cmd = tokens[1]
+        except:
+            self.cmd = None
+
+        try:
+            self.args = ' '.join(tokens[2:])
+        except:
+            self.args = None
+
 def command(cmd=None, perm=[], user_perm=[], bot_perm=[]):
     if cmd is not None and hasattr(cmd, '__call__'):
         command = cmd.__name__

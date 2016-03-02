@@ -1,4 +1,4 @@
-from config import BOTS_FOLDER, COMMANDS, DESCRIPTION, PERMISSIONS
+from config import BOTS_FOLDER, COMMANDS, DESCRIPTION, PERMISSIONS, PREFIX
 from discord import Client
 import humanfriendly
 import inspect
@@ -23,7 +23,7 @@ sys.path.append(__SHUCKLE__)
 
 from shuckle.core import Toolbox
 
-client = Toolbox(base=__BASE__, bots=__BOTS__, debug=__DEBUG__)
+client = Toolbox(base=__BASE__, bots=__BOTS__, prefix=PREFIX, debug=__DEBUG__)
 
 if __name__ == '__main__':
     print('Starting up...')

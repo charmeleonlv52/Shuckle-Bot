@@ -24,6 +24,7 @@ class ModBot(object):
     # channel given a message. Does not delete the
     # given message.
     async def prune_channel(self, message, func=None, include=False):
+        message = message.raw_message
         history = self.client.get_history(limit=MAX_INT, before=message)
 
         async for x in history:
@@ -37,7 +38,7 @@ class ModBot(object):
     # and sends it to the calling user.
     @command('archive', perm=['manage_messages', 'read_message_history'])
     async def archive_channel(self, message):
-        history = self.client.get_history(limit=MAX_INT, before=message)
+        history = self.client.get_history(limit=MAX_INT, before=message.raw_message)
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
         path = os.path.join('/tmp', '{}.txt'.format(time.time()))
 

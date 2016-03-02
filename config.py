@@ -36,9 +36,13 @@ Delete the current poll and don't show the results [U:MM]:
 ```
 @{bot_name} poll delete
 ```
-Deletes all messages in a channel (this is a potentially slow running operation) [B:MM/B:H]:
+Deletes all messages in a channel (potentially slow) [B:MM/B:H/U:MM/U:H]:
 ```
 @{bot_name} mod clear
+```
+Saves all previous messages in text file and sends it to the user (maximum of 15 MB; potentially slow) [B:MM/B:H/U:MM/U:H]
+```
+@{bot_name} mod archive
 ```
 Note: The leading character "~" may be substituted for "@{bot_name}".
 """
@@ -51,6 +55,8 @@ U: - User permission
 MM - Manage messages
 H - View message history
 """
+
+PREFIX = '~'
 
 BOTS_FOLDER = 'bots'
 

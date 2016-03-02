@@ -77,7 +77,7 @@ class PollBot(object):
         if message.channel in self.polls:
             return
         try:
-            data = message.content
+            data = message.args
 
             try:
                 data = json.loads(data)
@@ -160,7 +160,7 @@ class PollBot(object):
             return
         try:
             # Get vote option
-            option = int(message.content.split(VOTE)[1])
+            option = int(message.args)
             self.polls[message.channel].vote(option, message.author.id)
         except:
             traceback.print_exc()
