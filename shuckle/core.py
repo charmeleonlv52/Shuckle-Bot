@@ -147,7 +147,7 @@ class Toolbox(object):
             if template.group in self.commands:
                 command = self.commands[template.group][template.cmd]
 
-                if not self.has_perm(message.author, command.user_perm):
+                if not self.has_perm(template.author, command.user_perm):
                     print(command.user_perm)
                     await self.say('You don\'t have permission to use this command.')
 
