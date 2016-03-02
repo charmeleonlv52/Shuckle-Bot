@@ -54,7 +54,7 @@ def make_chart(title, values):
         chart.add('{} ({})'.format(value[0], value[1]), value[1])
 
     now = time.time()
-    path = os.path.join('tmp', '{}.png'.format(now))
+    path = os.path.join('/tmp', '{}.png'.format(now))
 
     chart.render_to_png(path)
 
@@ -157,10 +157,10 @@ class PollBot(object):
                 with open(chart, 'rb') as f:
                     await self.client.upload(f)
 
-                    try:
-                        os.remove(chart)
-                    except:
-                        pass
+                try:
+                    os.remove(chart)
+                except:
+                    pass
             else:
                 await self.client.say('**POLL: {}** - No Results'.format(data['title']))
 
