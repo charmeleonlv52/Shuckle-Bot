@@ -15,7 +15,7 @@ Adds a task to be run at a set interval [U:MM]:
 ```
 Removes as task from the scheduler [U:MM]:
 ```
-@{bot_name} schedule remove <task name>
+@{bot_name} schedule delete <task name>
 ```
 """
 
@@ -26,7 +26,7 @@ class ScheduleBot(object):
         self.client = client
         self.tasks = {}
 
-    @command
+    @command()
     async def help(self, message):
         await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
 
@@ -43,7 +43,7 @@ class ScheduleBot(object):
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
     @command(perm=['manage_messages'])
-    async def remove(self, message):
+    async def delete(self, message):
         name, delay, rest = parse_cmd(message.args)
         name = '{}.{}.{}'.format(message.server, message.channel, name)
 
@@ -76,7 +76,7 @@ class ScheduleBot(object):
 
             if full_name in self.tasks:
                 asyncio.ensure_future(do_task())
-            
+
         loop = asyncio.get_event_loop()
         future = asyncio.Future()
         asyncio.ensure_future(do_task())

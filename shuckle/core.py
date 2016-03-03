@@ -3,7 +3,7 @@ from discord import Client, errors
 import humanfriendly
 import os
 from secrets import secrets
-from command import Template
+from command import Frame
 import sys
 from time import time
 import traceback
@@ -107,7 +107,11 @@ class Toolbox(object):
     @property
     def uptime(self):
         return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
-    
+
+    @property
+    def iden(self):
+        return get_internal('_iden')
+
     async def say(self, message, *args, **kwargs):
         await self.client.send_message(self.channel, message, *args, **kwargs)
 
@@ -133,26 +137,27 @@ class Toolbox(object):
         perm = self.channel.permissions_for(user)
         return all(getattr(perm, x, False) for x in perm_list)
 
-    async def exec_command(self, template):
+    async def exec_command(self, frame):
         # Internal variables are set here because
         # asyncio loops run separate to our stack.
         #
         # This means get_internal will not find
         # these variables if we declare and define them
         # in on_message.
-        _channel = template.channel
-        _author = template.author
+        _channel = frame.channel
+        _author = frame.author
+        _iden = self.user if not frame.iden == self.__PREFIX__ else self.__PREFIX__
 
         try:
-            if template.group in self.commands:
-                command = self.commands[template.group][template.cmd]
+            if frame.group in self.commands:
+                command = self.commands[frame.group][frame.cmd]
 
-                if not self.has_perm(template.author, command.user_perm):
+                if not self.has_perm(frame.author, command.user_perm):
                     print(command.user_perm)
                     await self.say('You don\'t have permission to use this command.')
 
                 try:
-                    await command.run(template)
+                    await command.run(frame)
                 except errors.Forbidden:
                     raise ShucklePermissionError()
         except IndexError:
@@ -203,7 +208,8 @@ class Toolbox(object):
         mention = message.clean_content.startswith(mention_text)
 
         if mention or message.content.startswith(self.__PREFIX__):
-            template = Template(message, mention_text if mention else self.__PREFIX__)
+            iden = self.user if mention else self.__PREFIX__
+            frame = Frame(message, iden)
 
-            await self.help(template)
-            await self.exec_command(template)
+            await self.help(frame)
+            await self.exec_command(frame)

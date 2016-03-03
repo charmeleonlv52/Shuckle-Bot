@@ -43,26 +43,29 @@ class Command(object):
             'user_perm': self.user_perm
         })
 
-class Template(object):
+class Frame(object):
     def __init__(self, message, iden):
+        self.iden = iden
+
+        if hasattr(iden, 'name'):
+            iden = '@{} '.format(iden.name)
+
         content = message.clean_content.replace(iden, '', 1)
         tokens = content.split(' ')
 
-        self.raw_message = message
+        self.message = message
         self.author = message.author
         self.channel = message.channel
         self.server = message.server
+        self.iden = iden
         self.mentions = message.mentions
+
+        if '@{}'.format(iden) not in content and hasattr(self.iden, 'name'):
+            self.mentions.remove(self.iden)
 
         self.group, self.cmd, self.args = parse_cmd(content)
 
 def command(cmd=None, perm=[]):
-    if cmd is not None and hasattr(cmd, '__call__'):
-        command = cmd.__name__
-        cmd._shuckle_command = Command(command, cmd, perm)
-
-        return cmd
-
     def dec(func):
         if cmd is None:
             command = func.__name__

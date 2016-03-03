@@ -24,11 +24,11 @@ class StatBot(object):
     def __init__(self, client):
         self.client = client
 
-    @command
+    @command()
     async def help(self, message):
         await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
 
-    @command
+    @command()
     async def show(self, message):
         used_mem = virtual_memory().used
         total_mem = virtual_memory().total

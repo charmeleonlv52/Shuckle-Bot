@@ -96,11 +96,11 @@ class PollBot(object):
     def __init__(self, client):
         self.client = client
 
-    @command
+    @command()
     async def help(self, message):
         await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
 
-    @command
+    @command()
     async def make(self, message):
         # Only one poll per channel
         if message.channel in self.polls:
@@ -178,7 +178,7 @@ class PollBot(object):
         except:
             traceback.print_exc()
 
-    @command
+    @command()
     async def vote(self, message):
         # Check to see if there's even a poll to vote on
         if not message.channel in self.polls:
