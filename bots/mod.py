@@ -68,22 +68,22 @@ class ModBot(object):
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
         path = os.path.join('/tmp', '{}.txt'.format(time.time()))
 
-        size = 0
-
-        with open(path, 'w+') as f:
+        with open(path, 'wb+') as f:
             async for x in history:
                 out = '[{}] {}: {}\n'.format(x.timestamp, x.author.name, x.clean_content)
-
-                if size + len(out) > MAX_ATTACHMENT:
-                    break
+                out = out.encode('utf-8')
 
                 f.write(out)
+
+                if f.tell() > MAX_ATTACHMENT:
+                    f.truncate(MAX_ATTACHMENT)
+                    break
+
             f.flush()
 
-        channel = str(message.channel).replace(' ', '-')
-        server = str(message.server).replace(' ', '-')
+            channel = str(message.channel).replace(' ', '-')
+            server = str(message.server).replace(' ', '-')
 
-        with open(path, 'rb') as f:
             filename = '{}.{}-{}.txt'.format(server, channel, now)
             content = 'Here is the archive you requested:'
 
