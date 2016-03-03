@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/python3.5
 
 from config import BOTS_FOLDER, PREFIX
 from discord import Client
@@ -14,6 +14,7 @@ else:
     __DEBUG__ = False
 
 __BASE__ = os.path.abspath(os.path.dirname(__file__))
+__MAIN__ = os.path.abspath(__file__)
 __SHUCKLE__ = os.path.join(__BASE__, 'shuckle')
 __BOTS__ = os.path.join(__BASE__, BOTS_FOLDER)
 
@@ -21,7 +22,7 @@ sys.path.append(__SHUCKLE__)
 
 from shuckle.core import Toolbox
 
-client = Toolbox(base=__BASE__, bots=__BOTS__, prefix=PREFIX, debug=__DEBUG__)
+client = Toolbox(base=__BASE__, main=__MAIN__, bots=__BOTS__, prefix=PREFIX, debug=__DEBUG__)
 
 if __name__ == '__main__':
     print('Starting up...')

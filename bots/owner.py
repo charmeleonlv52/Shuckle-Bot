@@ -13,7 +13,7 @@ class OwnerBot(object):
     @command()
     async def restart(self, message):
         if message.author.id == OWNER_ID:
-            os.execv(os.path.join(self.client.__BASE__, 'shuckle.py'), sys.argv)
+            os.execv(os.path.join(self.client.__MAIN__), sys.argv)
         else:
             raise ShuckleUserPermissionError()
 
