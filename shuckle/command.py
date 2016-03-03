@@ -65,7 +65,7 @@ class Frame(object):
 
         self.group, self.cmd, self.args = parse_cmd(content)
 
-def command(cmd=None, perm=[]):
+def command(cmd=None, owner=False, perm=[]):
     def dec(func):
         if cmd is None:
             command = func.__name__

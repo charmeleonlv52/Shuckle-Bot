@@ -1,5 +1,6 @@
 from config import DESCRIPTION
 from discord import Client, errors
+from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
 import humanfriendly
 import os
 from secrets import secrets
@@ -8,17 +9,6 @@ import sys
 from time import time
 import traceback
 from util import get_internal
-
-class ShuckleError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
-
-class ShucklePermissionError(ShuckleError):
-    def __init__(self):
-        super().__init__('I don\'t have permission to do this.')
 
 class Toolbox(object):
     def __init__(self, base, bots, prefix=None, debug=False):
@@ -153,13 +143,13 @@ class Toolbox(object):
                 command = self.commands[frame.group][frame.cmd]
 
                 if not self.has_perm(frame.author, command.user_perm):
-                    print(command.user_perm)
-                    await self.say('You don\'t have permission to use this command.')
-
+                    raise ShuckleUserPermissionError()
                 try:
                     await command.run(frame)
                 except errors.Forbidden:
                     raise ShucklePermissionError()
+                except Exception as e:
+                    raise e
         except IndexError:
             pass
         except KeyError:

@@ -25,8 +25,8 @@ H - View message history
 """
 
 PREFIX = '~'
-
 BOTS_FOLDER = 'bots'
+OWNER_ID = '126383697929699328'
 
 # DO NOT TOUCH ANYTHING BELOW
 

@@ -8,7 +8,7 @@ class GeneralBot(object):
     def __init__(self, client):
         self.client = client
 
-    @command
+    @command()
     async def permissions(self, message):
         await self.client.say(
             PERMISSIONS
