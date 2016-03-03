@@ -5,7 +5,7 @@ Author: Reticence
 
 Language: Python 3.5.1
 
-Library: discord.py 0.9.2
+Library: discord.py async beta
 
 For more information use: `@Shuckle Bot info|help|about`. Alternatively, you can check the wiki<sup>soon</sup>.
 

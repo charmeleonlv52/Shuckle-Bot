@@ -2,7 +2,7 @@ DESCRIPTION = """
 **{bot_name}**
 Author: Reticence
 Language: Python 3.5.1
-Library: discord.py 0.9.2
+Library: discord.py async beta
 Uptime: {uptime}
 
 Shuckle combines many small bots into one super bot!
