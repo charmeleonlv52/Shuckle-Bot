@@ -1,3 +1,4 @@
+import asyncio
 from config import DESCRIPTION
 from discord import Client, errors
 from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
@@ -21,6 +22,7 @@ class Toolbox(object):
         self.__PREFIX__ = prefix
 
         self.commands = {}
+        self.setup = []
         self.client = Client()
         self.user = None
 
@@ -58,6 +60,12 @@ class Toolbox(object):
 
                 command.func = method
                 self.commands[x][cmd] = command
+
+
+
+        # If the bot has a setup add it to setup list
+        if hasattr(bot, 'setup') and hasattr(bot.setup, '__callable__'):
+            self.setup.append(bot)
 
     def _load_bots(self):
         bots = os.listdir(self.__BOTS__)
@@ -189,6 +197,11 @@ class Toolbox(object):
             self.server_count += 1
 
         print('Shuckle is online...')
+        print('Running bot setup functions...')
+        print('Shuckle is ready...')
+
+        for bot in self.setup:
+            await bot.setup()
 
     # on_message event handler
     async def on_message(self, message):

@@ -34,14 +34,4 @@ class OwnerBot(object):
         else:
             raise ShuckleUserPermissionError()
 
-    @command()
-    async def reload(self, message):
-        if message.author.id == OWNER_ID:
-            try:
-                self.client._load_bots()
-            except:
-                pass
-        else:
-            raise ShuckleUserPermissionError()
-
 bot = OwnerBot
