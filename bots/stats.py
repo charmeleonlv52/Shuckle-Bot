@@ -3,23 +3,11 @@ from psutil import virtual_memory
 from shuckle.command import command
 from shuckle.util import gen_help
 
-HELP = """
-__Stats Commands:__
-Show stats for geeks:
-```
-@{bot_name} stats show
-```
-"""
-
-STATS_DETAIL = """
-__Stats for Geeks:__
-Uptime: {uptime}
-Total Memory: {total_mem}
-Used Memory: {used_mem}
-Connected Servers: {server_count}
-"""
-
 class StatBot(object):
+    '''
+    **Stat Bot**
+    Provides commands to show various statistics.
+    '''
     __group__ = 'stats'
 
     def __init__(self, client):
@@ -27,10 +15,22 @@ class StatBot(object):
 
     @command()
     async def help(self, message):
-        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+        '''
+        Show stat commands:
+        ```
+        @{bot_name} stats help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
     async def show(self, message):
+        '''
+        Show Shuckle statistics:
+        ```
+        @{bot_name} stats show
+        ```
+        '''
         used_mem = virtual_memory().used
         total_mem = virtual_memory().total
 

@@ -22,7 +22,6 @@ class Frame(object):
         self.group, self.cmd, self.args = parse_cmd(content)
 
 '''
-__doc__ for command documentation
 move secrets path to config
 objectify config
 clean up command parsing
