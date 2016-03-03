@@ -1,5 +1,6 @@
 import asyncio
 from shuckle.command import command
+from shuckle.util import gen_help
 import humanfriendly
 import json
 import os
@@ -17,31 +18,6 @@ DiscordStyle = Style(
     foreground_subtle='#546e7a',
     colors=('#738bd7', '#1abc9c', '#3498db', '#e91e63', '#f1c40f')
 )
-
-HELP = """
-__Poll Commands:__
-
-Create a new poll in the current channel [B:AF]:
-```
-@{bot_name} poll make {{
-    "title": <string>,
-    "duration": <integer|seconds>,
-    "options": [<string>]
-}}
-```
-Shorthand for the above (does not support colons in options) [B:AF]:
-```
-@{bot_name} poll make <title>:<duration>:<option>[:<option>]
-```
-Cast your vote for the current poll:
-```
-@{bot_name} poll vote <integer>
-```
-Delete the current poll and don't show the results [U:MM]:
-```
-@{bot_name} poll delete
-```
-"""
 
 def make_chart(title, values):
     chart = pygal.Pie(
@@ -91,6 +67,10 @@ class Poll(object):
         return sorted(results, key=lambda x: x[1], reverse=True)
 
 class PollBot(object):
+    '''
+    **Poll Bot**
+    Provides commands for poll creation.
+    '''
     __group__ = 'poll'
     polls = {}
 
@@ -99,10 +79,30 @@ class PollBot(object):
 
     @command()
     async def help(self, message):
-        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+        '''
+        Shows poll commands:
+        ```
+        @{bot_name} poll help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
     async def make(self, message):
+        '''
+        Create a new poll in the current channel [B:AF]:
+        ```
+        @{bot_name} poll make {{
+            "title": <string>,
+            "duration": <integer|seconds>,
+            "options": [<string>]
+        }}
+        ```
+        Shorthand for the above (does not support colons in options) [B:AF]:
+        ```
+        @{bot_name} poll make <title>:<duration>:<option>[:<option>]
+        ```
+        '''
         # Only one poll per channel
         if message.channel in self.polls:
             return
@@ -181,6 +181,12 @@ class PollBot(object):
 
     @command()
     async def vote(self, message):
+        '''
+        Cast your vote for the current poll:
+        ```
+        @{bot_name} poll vote <integer>
+        ```
+        '''
         # Check to see if there's even a poll to vote on
         if not message.channel in self.polls:
             return
@@ -193,6 +199,12 @@ class PollBot(object):
 
     @command(perm=['manage_messages'])
     async def delete(self, message):
+        '''
+        Delete the current poll and don't show the results [U:MM]:
+        ```
+        @{bot_name} poll delete
+        ```
+        '''
         try:
             self.polls[message.channel].closed = True
             del self.polls[message.channel]

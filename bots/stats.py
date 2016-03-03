@@ -1,6 +1,7 @@
 from humanfriendly import format_size
 from psutil import virtual_memory
 from shuckle.command import command
+from shuckle.util import gen_help
 
 HELP = """
 __Stats Commands:__
@@ -19,7 +20,7 @@ Connected Servers: {server_count}
 """
 
 class StatBot(object):
-    __group__ = ['stats']
+    __group__ = 'stats'
 
     def __init__(self, client):
         self.client = client

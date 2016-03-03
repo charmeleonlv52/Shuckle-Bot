@@ -1,25 +1,13 @@
 import asyncio
 import humanfriendly
 from shuckle.command import command, parse_cmd
-
-HELP = """
-__Schedule Commands:__
-
-Lists all scheduled tasks to run [U:MM]:
-```
-@{bot_name} schedule list
-```
-Adds a task to be run at a set interval [U:MM]:
-```
-@{bot_name} schedule add <task name> <interval> <command (no prefix)>
-```
-Removes as task from the scheduler [U:MM]:
-```
-@{bot_name} schedule delete <task name>
-```
-"""
+from shuckle.util import gen_help
 
 class ScheduleBot(object):
+    '''
+    **Schedule Bot**
+    Provides commands to schedule periodic tasks to run.
+    '''
     __group__ = 'schedule'
 
     def __init__(self, client):
@@ -28,13 +16,23 @@ class ScheduleBot(object):
 
     @command()
     async def help(self, message):
-        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+        '''
+        Show schedule commands:
+        ```
+        @{bot_name} schedule help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(perm=['manage_messages'])
     async def list(self, message):
+        '''
+        Lists all scheduled tasks to run [U:MM]:
+        ```
+        @{bot_name} schedule list
+        ```
+        '''
         task_list = []
-
-        print(self.tasks)
 
         for task in sorted(self.tasks.keys()):
             task_list.append('{}: {}'.format(task, self.tasks[task]))
@@ -44,6 +42,12 @@ class ScheduleBot(object):
 
     @command(perm=['manage_messages'])
     async def delete(self, message):
+        '''
+        Adds a task to be run at a set interval [U:MM]:
+        ```
+        @{bot_name} schedule add <task name> <interval> <command (no prefix)>
+        ```
+        '''
         name, delay, rest = parse_cmd(message.args)
         name = '{}.{}.{}'.format(message.server, message.channel, name)
 
@@ -55,6 +59,12 @@ class ScheduleBot(object):
 
     @command(perm=['manage_messages'])
     async def add(self, message):
+        '''
+        Removes as task from the scheduler [U:MM]:
+        ```
+        @{bot_name} schedule delete <task name>
+        ```
+        '''
         name, delay, rest = parse_cmd(message.args)
         group, cmd, args = parse_cmd(rest)
         sdelay = humanfriendly.parse_timespan(delay)

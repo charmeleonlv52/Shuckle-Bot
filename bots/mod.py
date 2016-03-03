@@ -29,7 +29,6 @@ class ModBot(object):
         @{bot_name} mod help
         ```
         '''
-
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(perm=['manage_messages'])
