@@ -10,7 +10,7 @@ Shuckle combines many small bots into one super bot!
 __Installed Modules:__
 {bot_list}
 
-Want bot specific information? Use: `@{bot_name} <module> help`
+Want module specific information? Use: `@{bot_name} <module> help`
 Want to see the permission glossery? Use: `@{bot_name} info|help|about permissions`
 """
 
