@@ -62,7 +62,7 @@ class ModBot(object):
         history = self.client.get_history(limit=MAX_INT)
 
         async for x in history:
-            if func is not None and func(x) or func is None:
+            if func is None or func(x):
                 await self.client.delete(x)
 
     # Archives an entire channel to a text file

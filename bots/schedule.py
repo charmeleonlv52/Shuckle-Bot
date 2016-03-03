@@ -78,7 +78,6 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        future = asyncio.Future()
         asyncio.ensure_future(do_task())
 
         self.tasks[full_name] = original_command

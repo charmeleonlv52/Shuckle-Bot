@@ -31,6 +31,6 @@ def gen_help(bot):
             commands.append(dedent(getattr(bot, x).__doc__).strip())
 
     return GENERIC_HELP.strip().format(
-        class_doc=dedent(bot.__doc__).strip(),
+        class_doc=dedent(bot.__doc__.strip()),
         commands=dedent('\n'.join(commands))
     )

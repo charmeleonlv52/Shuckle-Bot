@@ -74,7 +74,8 @@ class Poll(object):
         results = [0 for x in self.options]
 
         for x in self.votes:
-            results[self.votes[x] - 1] += 1
+            if self.votes[x] >= len(results):
+                results[self.votes[x] - 1] += 1
 
         if sum(results) == 0:
             return None
