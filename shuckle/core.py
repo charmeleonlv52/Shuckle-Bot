@@ -5,7 +5,7 @@ from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionErr
 import humanfriendly
 import os
 from secrets import secrets
-from command import Frame
+from frame import Frame
 import sys
 from time import time
 import traceback
@@ -60,8 +60,6 @@ class Toolbox(object):
 
                 command.func = method
                 self.commands[x][cmd] = command
-
-
 
         # If the bot has a setup add it to setup list
         if hasattr(bot, 'setup') and hasattr(bot.setup, '__callable__'):
@@ -145,48 +143,38 @@ class Toolbox(object):
         # in on_message.
         _channel = frame.channel
         _author = frame.author
-        _iden = self.user if not frame.iden == self.__PREFIX__ else self.__PREFIX__
+        _iden = frame.iden
 
         try:
-            if frame.group in self.commands:
-                command = self.commands[frame.group][frame.cmd]
+            try:
+                # There is a limited number of commands
+                # with no group. All of them are core
+                # commands.
+                if frame.cmd is None:
+                    await self.help(message)
 
-                if not self.has_perm(frame.author, command.user_perm):
-                    raise ShuckleUserPermissionError()
-                try:
-                    await command.run(frame)
-                except errors.Forbidden:
-                    raise ShucklePermissionError()
-                except Exception as e:
-                    raise e
-        except IndexError:
-            pass
-        except KeyError:
-            pass
-        except ShuckleError as e:
-            if self.__DEBUG__: traceback.print_exc()
-            await self.say(e)
-        except:
-            traceback.print_exc()
+                if frame.group in self.commands:
+                    command = self.commands[frame.group][frame.cmd]
 
-    # Display Shuckle help information.
-    async def help(self, message):
-        if message.cmd is not None:
-            return
-
-        if any(message.group == x for x in ['help', 'about', 'info']):
-            # self.say not used because _channel
-            # is set in exec_command. help by itself
-            # is not invoked through exec_command.
-            await self.client.send_message(
-                message.channel,
-                DESCRIPTION.format(
-                    bot_name=self.user.name,
-                    uptime=self.uptime,
-                    bot_list=', '.join(sorted(self.commands.keys())),
-                    prefix=self.__PREFIX__
-                )
-            )
+                    if not self.has_perm(frame.author, command.user_perm):
+                        raise ShuckleUserPermissionError()
+                    try:
+                        await command.run(frame)
+                    except errors.Forbidden:
+                        raise ShucklePermissionError()
+                    except Exception as e:
+                        raise e
+            except IndexError:
+                pass
+            except KeyError:
+                pass
+            except ShuckleError as e:
+                if self.__DEBUG__: traceback.print_exc()
+                await self.say(e)
+            except:
+                traceback.print_exc()
+        except errors.Forbidden:
+            print('Error: No write permission for {}.{}'.format(frame.server, frame.channel))
 
     # Ready event handler
     async def on_ready(self):
@@ -215,5 +203,27 @@ class Toolbox(object):
             iden = self.user if mention else self.__PREFIX__
             frame = Frame(message, iden)
 
-            await self.help(frame)
+            # Swallow help command errors
+            # they aren't important
+
             await self.exec_command(frame)
+
+    ##################################
+    # CORE COMMANDS
+    ##################################
+
+    async def help(self, message):
+        '''
+        Display general information about Shuckle:
+        @{bot_name} help|about|info
+        '''
+        if any(message.group == x for x in ['help', 'about', 'info']):
+            await self.say(
+                message.channel,
+                DESCRIPTION.format(
+                    bot_name=self.user.name,
+                    uptime=self.uptime,
+                    bot_list=', '.join(sorted(self.commands.keys())),
+                    prefix=self.__PREFIX__
+                )
+            )

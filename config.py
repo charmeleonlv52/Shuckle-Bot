@@ -11,7 +11,7 @@ __Installed Modules:__
 {bot_list}
 
 Want module specific information? Use: `@{bot_name} <module> help`
-Want to see the permission glossery? Use: `@{bot_name} info|help|about permissions`
+Want to see the permission glossery? Use: `@{bot_name} help|about|info permissions`
 """
 
 PERMISSIONS = """
