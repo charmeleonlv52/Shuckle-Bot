@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.5
+
 from config import BOTS_FOLDER, PREFIX
 from discord import Client
 import os
