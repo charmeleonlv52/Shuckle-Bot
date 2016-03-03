@@ -21,7 +21,7 @@ DiscordStyle = Style(
 HELP = """
 __Poll Commands:__
 
-Create a new poll in the current channel:
+Create a new poll in the current channel [B:AF]:
 ```
 @{bot_name} poll make {{
     "title": <string>,
@@ -29,7 +29,7 @@ Create a new poll in the current channel:
     "options": [<string>]
 }}
 ```
-Shorthand for the above (does not support colons in options):
+Shorthand for the above (does not support colons in options) [B:AF]:
 ```
 @{bot_name} poll make <title>:<duration>:<option>[:<option>]
 ```

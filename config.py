@@ -19,6 +19,7 @@ __Permission Legend:__
 
 B: - Bot permission
 U: - User permission
+AF - Attach files
 MM - Manage messages
 H - View message history
 """
