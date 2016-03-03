@@ -7,33 +7,11 @@ Language: Python 3.5.1
 
 Library: discord.py 0.9.2
 
-__Commands:__
+For more information use: `@Shuckle Bot info|help|about`. Alternatively, you can check the wiki<sup>soon</sup>.
 
-Show bot description:
-```
-@Shuckle Bot info|help|about
-```
-Create a new poll in the current channel:
-```
-@Shuckle Bot poll make {
-    "title": <string>,
-    "duration": <integer|seconds>,
-    "options": [<string>]
-}
-```
-Shorthand for the above (does not support colons in options):
-```
-@Shuckle Bot poll make <title>:<duration|seconds>:<option>[:<option>]
-```
-Cast your vote for the current poll:
-```
-@Shuckle Bot poll vote <integer>
-```
-Delete the current poll and don't show the results (requires the ability to manage messages)
-```
-@Shuckle Bot poll delete
-```
-Deletes all messages in a channel (requires the ability to manage messages and read message history)
-```
-@Shuckle Bot mod clear
-```
+Installation
+===
+1. Edit config.py to your liking.
+2. `python3.5 -m pip install git+https://github.com/Rapptz/discord.py@async`
+3. `python3.5 -m pip install -r requirements.txt`
+4. `chmod +x; ./start.sh` or `python3.5 shuckle.py`
