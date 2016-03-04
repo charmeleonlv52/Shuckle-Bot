@@ -1,5 +1,6 @@
 import asyncio
 import copy
+from discord.errors import InvalidArgument
 import humanfriendly
 import json
 import os
@@ -69,9 +70,13 @@ class ScheduleBot(object):
 
     def __init__(self, client):
         self.client = client
+        # Suppress all bot messages
+        # while loading task schedule.
+        self.announce = True
         self.tasks = TaskTable()
 
     async def setup(self):
+        self.announce = False
         table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
 
         if not os.path.isfile(table_path):
@@ -86,6 +91,8 @@ class ScheduleBot(object):
         if ghost_table:
             for task in ghost_table:
                 await self.add(task)
+
+        self.announce = True
 
     @command()
     async def help(self, frame):
@@ -161,7 +168,8 @@ class ScheduleBot(object):
         self.tasks.add_task(task)
         self.save_schedule()
 
-        await self.client.say('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
+        if announce:
+            await self.client.say('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
 
         try:
             loop.run_forever()
@@ -172,7 +180,12 @@ class ScheduleBot(object):
         table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
         flat_table = flatten(self.tasks.tasks)
 
+        pickle_data = []
+
+        for task in flat_table:
+            picke_data.append(task.frame)
+
         with FileLock(table_path, 'wb+') as f:
-            pickle.dump(flat_table, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(pickle_data, f, pickle.HIGHEST_PROTOCOL)
 
 bot = ScheduleBot
