@@ -6,8 +6,5 @@ from object import Object
 secrets = Object()
 
 with open(config.secrets_path) as f:
-    lines = ''.join(f.readlines())
-
-    s = json.loads(lines)
-
+    s = json.loads(f.read())
     secrets.update(s)

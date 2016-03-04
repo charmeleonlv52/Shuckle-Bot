@@ -12,12 +12,13 @@ import traceback
 from util import get_internal
 
 class Toolbox(object):
-    def __init__(self, base, main, bots, prefix=None, debug=False):
+    def __init__(self, base, main, data, bots, prefix=None, debug=False):
         self.start_time = time()
 
         self.__DEBUG__ = debug
         self.__BASE__ = base
         self.__MAIN__ = main
+        self.__DATA__ = data
         self.__BOTS__ = bots
         self.__PREFIX__ = prefix
 

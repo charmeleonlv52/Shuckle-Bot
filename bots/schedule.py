@@ -1,6 +1,9 @@
 import asyncio
 import humanfriendly
+import json
+import os
 from shuckle.command import command, parse_cmd
+from shuckle.data import read_file, write_file
 from shuckle.error import ShuckleError
 from shuckle.util import gen_help
 
@@ -12,8 +15,8 @@ class Task(object):
         self.task = task
 
 class TaskTable(object):
-    def __init__(self):
-        self.tasks = {}
+    def __init__(self, tasks={}):
+        self.tasks = tasks
 
     def add_task(self, task):
         server = task.server
@@ -50,6 +53,9 @@ class TaskTable(object):
         except KeyError:
             return []
 
+    def __repr__(self):
+        return json.dumps(self.tasks)
+
 class ScheduleBot(object):
     '''
     **Schedule Bot**
@@ -60,6 +66,17 @@ class ScheduleBot(object):
     def __init__(self, client):
         self.client = client
         self.tasks = TaskTable()
+
+    def setup(self):
+        table_path = os.path.join(self.client.__DATA__, 'task_table.json')
+
+        if not os.path.isfile(table_task):
+            return
+
+        contents = read_file(table_path)
+
+        if contents:
+            self.tasks = TaskTable(json.loads(contents))
 
     @command()
     async def help(self, frame):
@@ -94,6 +111,8 @@ class ScheduleBot(object):
         '''
         task = Task(frame.server, frame.channel, frame.args)
         self.tasks.delete_task(task)
+
+        await self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
 
     @command(perm=['manage_messages'])
@@ -126,10 +145,11 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        asyncio.ensure_future(do_task())
-
         task = Task(frame.server, frame.channel, name, original_command)
+
+        asyncio.ensure_future(do_task())
         self.tasks.add_task(task)
+        self.save_schedule()
 
         await self.client.say('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
 
@@ -137,5 +157,10 @@ class ScheduleBot(object):
             loop.run_forever()
         except:
             pass
+
+    def save_schedule(self):
+        output = repr(self.tasks)
+        table_path = os.path.join(self.client.__DATA__, 'task_table.json')
+        write_file(table_path, output)
 
 bot = ScheduleBot

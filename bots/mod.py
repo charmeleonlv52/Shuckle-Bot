@@ -76,9 +76,8 @@ class ModBot(object):
         '''
         history = self.client.get_history(limit=MAX_INT)
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
-        path = os.path.join('/tmp', '{}.txt'.format(time.time()))
 
-        with open(path, 'wb+') as f:
+        with os.tmpfile() as f:
             async for x in history:
                 out = '[{}] {}: {}\n'.format(x.timestamp, x.author.name, x.clean_content)
                 out = out.encode('utf-8')
@@ -102,8 +101,5 @@ class ModBot(object):
             content = 'Here is the archive you requested:'
 
             await self.client.attach(frame.author, f, content=content, filename=filename)
-
-        if not self.client.__DEBUG__:
-            os.remove(path)
 
 bot = ModBot
