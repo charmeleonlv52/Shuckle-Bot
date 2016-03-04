@@ -13,9 +13,9 @@ from shuckle.types import Timespan
 from shuckle.util import gen_help, flatten
 
 class Task(object):
-    def __init__(self, server, channel, name, frame, task):
-        self.server = server
-        self.channel = channel
+    def __init__(self, name, task, frame):
+        self.server = frame.server
+        self.channel = frame.channel
         self.name = name
         self.frame = frame
         self.task = task
@@ -156,7 +156,7 @@ class ScheduleBot(object):
         original_frame = copy.deepcopy(frame)
 
         frame.message = ' '.join(command)
-        # frame.parent = self.add
+        frame.parent = self.add
         delay = delay.duration
 
         if self.tasks.get_task(frame.server, frame.channel, name):
@@ -170,7 +170,7 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        task = Task(frame.server, frame.channel, name, original_frame, original_command)
+        task = Task(name, original_command, original_frame)
 
         asyncio.ensure_future(do_task())
         self.tasks.add_task(task)

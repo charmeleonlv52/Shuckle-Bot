@@ -3,7 +3,7 @@ class ShuckleError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return 'Error: ' + self.message
 
 class ShucklePermissionError(ShuckleError):
     def __init__(self):

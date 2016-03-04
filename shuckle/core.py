@@ -71,7 +71,7 @@ class Toolbox(object):
 
                 # Check for namespace collisions
                 if cmd in self.commands[x]:
-                    raise ShuckleError('Error: Found duplicate definition for <{}.{}>'.format(x, cmd))
+                    raise ShuckleError('Found duplicate definition for <{}.{}>'.format(x, cmd))
 
                 command.func = method
                 self.commands[x][cmd] = command
@@ -195,10 +195,13 @@ class Toolbox(object):
                 # with no group. All of them are core
                 # commands.
                 if cmd is None:
-                    await self.help(frame)
+                    await self.help(group)
 
                 if group in self.commands:
                     command = self.commands[group][cmd]
+
+                    if frame.parent == command:
+                        raise ShuckleError('Recursive commands are not allowed.')
 
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
