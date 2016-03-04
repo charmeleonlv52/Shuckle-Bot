@@ -5,7 +5,7 @@ import json
 import os
 import pickle
 from shuckle.command import command, parse_cmd
-from shuckle.data import read_binary, write_binary
+from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.util import gen_help
 
@@ -76,6 +76,8 @@ class ScheduleBot(object):
 
         if not os.path.isfile(table_path):
             return
+
+        with FileLock(table_path)
 
         contents = read_binary(table_path)
 
@@ -170,8 +172,9 @@ class ScheduleBot(object):
             pass
 
     def save_schedule(self):
-        output = pickle.dumps(self.tasks.tasks)
         table_path = os.path.join(self.client.__DATA__, 'task_table.json')
-        write_binary(table_path, output)
+
+        with FileLock(table_path) as f:
+            pickle.dump(self.tasks.tasks, f, pickle.HIGHEST_PROTOCOL)
 
 bot = ScheduleBot

@@ -1,50 +1,22 @@
 from fcntl import lockf, LOCK_EX, LOCK_UN
 import os
 
-def write_binary(path, data):
-    try:
-        with open(path, 'wb+') as f:
-            lockf(f, LOCK_EX)
-            f.write(data)
-            lockf(f, LOCK_UN)
+class FileLock(object):
+    def __enter__(path, mode='wb+'):
+        self.f = open(path, mode)
 
-        return True
-    except:
-        return False
+        lockf(self.f, LOCK_EX)
+        return f
 
-def read_binary(path):
-    data = None
-
-    try:
-        with open(path, 'rb') as f:
-            lockf(f, LOCK_EX)
-            data = f.read()
-            lockf(f, LOCK_UN)
-    except:
-        pass
-    finally:
-        return data
+    def __exit__(*args, **kwargs):
+        lockf(self.f, LOCK_UN)
+        self.f.flush()
+        self.f.close()
 
 def write_file(path, data):
-    try:
-        with open(path, 'w+') as f:
-            lockf(f, LOCK_EX)
-            f.write(data)
-            lockf(f, LOCK_UN)
-
-        return True
-    except:
-        return False
+    with FileLock(path, mode='w+') as f:
+        f.write(data)
 
 def read_file(path):
-    data = None
-
-    try:
-        with open(path, 'w+') as f:
-            lockf(f, LOCK_EX)
-            data = f.read()
-            lockf(f, LOCK_UN)
-    except:
-        pass
-    finally:
-        return data
+    with FileLock(path, mode='r') as f:
+        return f.read()
