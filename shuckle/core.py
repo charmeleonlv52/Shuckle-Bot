@@ -24,6 +24,7 @@ class Toolbox(object):
 
         self.commands = {}
         self.setup = []
+        self.teardown = []
         self.client = Client()
         self.user = None
 
@@ -65,6 +66,8 @@ class Toolbox(object):
         # If the bot has a setup add it to setup list
         if hasattr(bot, 'setup') and hasattr(bot.setup, '__call__'):
             self.setup.append(bot)
+        if hasattr(bot, 'teardown') and hasattr(bot.teardown, '__call__'):
+            self.teardown.append(bot)
 
     def _load_bots(self):
         bots = os.listdir(self.__BOTS__)
