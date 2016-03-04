@@ -2,13 +2,13 @@ from fcntl import lockf, LOCK_EX, LOCK_UN
 import os
 
 class FileLock(object):
-    def __enter__(path, mode='wb+'):
+    def __enter__(self, path, mode='wb+'):
         self.f = open(path, mode)
 
         lockf(self.f, LOCK_EX)
         return f
 
-    def __exit__(*args, **kwargs):
+    def __exit__(self, *args):
         lockf(self.f, LOCK_UN)
         self.f.flush()
         self.f.close()
