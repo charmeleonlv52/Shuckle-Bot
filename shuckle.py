@@ -1,10 +1,11 @@
 #!/usr/bin/python3.5
 
-from config import config
 from discord import Client
 import os
-from secrets import secrets
 import sys
+
+from config import config
+from secrets import secrets
 
 if '--debug' in sys.argv:
     __DEBUG__ = True

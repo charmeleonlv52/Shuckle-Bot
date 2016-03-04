@@ -1,6 +1,7 @@
-from config import config
 import json
 import os
+
+from config import config
 from object import Object
 
 secrets = Object()

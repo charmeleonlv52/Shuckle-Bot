@@ -1,15 +1,17 @@
 import asyncio
-from config import config
 from discord import Client, errors
-from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
 import humanfriendly
 import os
-from secrets import secrets
-from frame import Frame
 import sys
 from time import time
 import traceback
-from util import get_internal
+
+from config import config
+from secrets import secrets
+
+from .error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
+from .frame import Frame
+from .util import get_internal
 
 class Toolbox(object):
     def __init__(self, base, main, data, bots, prefix=None, debug=False):

@@ -1,5 +1,6 @@
 from humanfriendly import format_size
 from psutil import virtual_memory
+
 from shuckle.command import command
 from shuckle.util import gen_help
 

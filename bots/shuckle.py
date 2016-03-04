@@ -1,9 +1,11 @@
-from config import config
 import os
+import sys
+
+from config import config
+
 from shuckle.command import command
 from shuckle.util import gen_help
 from shuckle.error import ShuckleUserPermissionError
-import sys
 
 class ShuckleBot(object):
     '''

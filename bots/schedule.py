@@ -4,6 +4,7 @@ from discord.errors import InvalidArgument
 import humanfriendly
 import os
 import pickle
+
 from shuckle.command import command, parse_cmd
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
@@ -128,7 +129,7 @@ class ScheduleBot(object):
         task = Task(frame.server, frame.channel, frame.args, frame)
 
         if not self.tasks.delete_task(task):
-            self.client.say('This task does not exist.')
+            raise ShuckleError('This task does not exist.')
 
         self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
@@ -149,8 +150,7 @@ class ScheduleBot(object):
         original_command = frame.args
 
         if self.tasks.get_task(frame.server, frame.channel, name):
-            await self.client.say('This task already exists.')
-            return
+            raise ShuckleError('This task already exists.')
 
         frame.group = group
         frame.cmd = cmd
@@ -171,7 +171,7 @@ class ScheduleBot(object):
         self.save_schedule()
 
         if self.announce:
-            await self.client.say('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
+            raise ShuckleError('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
 
         try:
             loop.run_forever()

@@ -1,4 +1,5 @@
 import asyncio
+
 from shuckle.command import command
 
 class Stream(object):

@@ -1,4 +1,4 @@
-from command import parse_cmd
+from .command import parse_cmd
 
 class Frame(object):
     def __init__(self, message, iden):

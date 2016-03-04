@@ -1,4 +1,5 @@
 from config import config
+
 from shuckle.command import command
 
 class GeneralBot(object):

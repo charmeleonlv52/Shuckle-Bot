@@ -1,8 +1,9 @@
 import asyncio
 from datetime import datetime
 import os
-from shuckle.command import command
 import time
+
+from shuckle.command import command
 from shuckle.util import gen_help
 
 # Arbitrarily large number that we

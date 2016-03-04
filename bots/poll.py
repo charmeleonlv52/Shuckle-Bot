@@ -1,6 +1,4 @@
 import asyncio
-from shuckle.command import command
-from shuckle.util import gen_help
 import humanfriendly
 import json
 import os
@@ -8,6 +6,9 @@ import pygal
 from pygal.style import Style
 import time
 import traceback
+
+from shuckle.command import command
+from shuckle.util import gen_help
 
 DiscordStyle = Style(
     background='#ffffff',
