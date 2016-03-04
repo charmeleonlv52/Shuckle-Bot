@@ -86,6 +86,12 @@ class Toolbox(object):
             # Try loading the bot
             self._try_load(bot)
 
+    def _unload_bots(self):
+        for bot in self.teardown:
+            bot.teardown()
+
+        self.commands = {}
+
     def run(self, email, password):
         try:
             self._load_bots()

@@ -2,7 +2,6 @@ import asyncio
 import copy
 from discord.errors import InvalidArgument
 import humanfriendly
-import json
 import os
 import pickle
 from shuckle.command import command, parse_cmd

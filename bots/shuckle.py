@@ -5,12 +5,12 @@ from shuckle.util import gen_help
 from shuckle.error import ShuckleUserPermissionError
 import sys
 
-class OwnerBot(object):
+class ShuckleBot(object):
     '''
-    **Owner Bot**
+    **Shuckle Bot**
     Provides commands for Shuckle's owner.
     '''
-    __group__ = 'owner'
+    __group__ = 'shuckle'
 
     def __init__(self, client):
         self.client = client
@@ -18,7 +18,7 @@ class OwnerBot(object):
     @command()
     async def help(self, frame):
         '''
-        Shows owner commands:
+        Shows shuckle commands:
         ```
         @{bot_name} owner help
         ```
@@ -38,4 +38,18 @@ class OwnerBot(object):
         else:
             raise ShuckleUserPermissionError()
 
-bot = OwnerBot
+    @command()
+    async def reload(self, frame):
+        '''
+        Reloads all Shuckle modules:
+        ```
+        @{bot_name} shuckle reload
+        ```
+        '''
+        if frame.author.id == config.owner_id:
+            self.client._unload_bots()
+            self.client._load_bots()
+        else:
+            raise ShuckleUserPermissionError()
+
+bot = ShuckleBot

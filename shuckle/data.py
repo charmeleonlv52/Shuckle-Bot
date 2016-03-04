@@ -8,7 +8,6 @@ class FileLock(object):
 
     def __enter__(self):
         self.f = open(self.path, self.mode)
-
         lockf(self.f, LOCK_EX)
         return self.f
 
