@@ -19,8 +19,8 @@ class TaskTable(object):
         self.tasks = tasks
 
     def add_task(self, task):
-        server = task.server
-        channel = task.channel
+        server = task.server.name
+        channel = task.channel.name
         name = task.name
         task = task.task
 
@@ -97,7 +97,7 @@ class ScheduleBot(object):
         ```
         '''
         server, channel = frame.server, frame.channel
-        task_list = map(lambda x, y: '{}: {}'.format(x, y), self.tasks.list_tasks(server, channel))
+        task_list = map(lambda (x, y): '{}: {}'.format(x, y), self.tasks.list_tasks(server, channel))
         task_list = '\n'.join(task_list)
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
