@@ -13,7 +13,7 @@ class TwitchBot(object):
         self.client = client
         self.to_check = {}
 
-    async def setup():
+    def setup(self):
         '''
         for each stream to check:
             if streaming:
@@ -23,6 +23,7 @@ class TwitchBot(object):
         requeue async loop
         '''
         print('Setting up Twitch bot event loop...')
+        return True
 
     @command(perm=['manage_messages'])
     def announce(self, message):

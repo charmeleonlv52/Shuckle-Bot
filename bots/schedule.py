@@ -74,13 +74,14 @@ class ScheduleBot(object):
     def setup(self):
         table_path = os.path.join(self.client.__DATA__, 'task_table.json')
 
-        if not os.path.isfile(table_task):
+        if not os.path.isfile(table_path):
             return
 
         contents = read_binary(table_path)
 
         if contents:
             ghost_table = pickle.loads(contents)
+            print(ghost_table)
 
             for server in ghost_table.tasks:
                 for channel in ghost_table.tasks[server]:

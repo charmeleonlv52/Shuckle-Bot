@@ -63,7 +63,7 @@ class Toolbox(object):
                 self.commands[x][cmd] = command
 
         # If the bot has a setup add it to setup list
-        if hasattr(bot, 'setup') and hasattr(bot.setup, '__callable__'):
+        if hasattr(bot, 'setup') and hasattr(bot.setup, '__call__'):
             self.setup.append(bot)
 
     def _load_bots(self):
@@ -150,10 +150,11 @@ class Toolbox(object):
 
         print('Shuckle is online...')
         print('Running bot setup functions...')
-        print('Shuckle is ready...')
 
         for bot in self.setup:
-            await bot.setup()
+            bot.setup()
+
+        print('Shuckle is ready...')
 
     # on_message event handler
     async def on_message(self, message):
