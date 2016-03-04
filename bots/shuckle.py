@@ -20,7 +20,7 @@ class ShuckleBot(object):
         '''
         Shows shuckle commands:
         ```
-        @{bot_name} owner help
+        @{bot_name} shuckle help
         ```
         '''
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
@@ -30,10 +30,11 @@ class ShuckleBot(object):
         '''
         Restarts Shuckle:
         ```
-        @{bot_name} owner restart
+        @{bot_name} shuckle restart
         ```
         '''
         if frame.author.id == config.owner_id:
+            await self.client.say('Restarting Shuckle...')
             os.execv(os.path.join(self.client.__MAIN__), sys.argv)
         else:
             raise ShuckleUserPermissionError()
@@ -49,6 +50,8 @@ class ShuckleBot(object):
         if frame.author.id == config.owner_id:
             self.client._unload_bots()
             self.client._load_bots()
+
+            await self.client.say('Reloading modules...')
         else:
             raise ShuckleUserPermissionError()
 
