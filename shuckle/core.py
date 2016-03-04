@@ -98,43 +98,6 @@ class Toolbox(object):
 
         self.client.run(email, password)
 
-    @property
-    def channel(self):
-        return get_internal('_channel')
-
-    @property
-    def uptime(self):
-        return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
-
-    @property
-    def iden(self):
-        return get_internal('_iden')
-
-    async def say(self, message, *args, **kwargs):
-        await self.client.send_message(self.channel, message, *args, **kwargs)
-
-    async def tell(self, *args, **kwargs):
-        await self.client.send_message(get_internal('_author'), *args, **kwargs)
-
-    async def upload(self, f, *args, **kwargs):
-        await self.client.send_file(self.channel, f, *args, **kwargs)
-
-    async def delete(self, *args, **kwargs):
-        await self.client.delete_message(*args, **kwargs)
-
-    async def edit(self, *args, **kwargs):
-        await self.client.edit_message(*args, **kwargs)
-
-    async def attach(self, *args, **kwargs):
-        await self.client.send_file(*args, **kwargs)
-
-    def get_history(self, **kwargs):
-        return self.client.logs_from(self.channel, **kwargs)
-
-    def has_perm(self, user, perm_list):
-        perm = self.channel.permissions_for(user)
-        return all(getattr(perm, x, False) for x in perm_list)
-
     async def exec_command(self, frame):
         # Internal variables are set here because
         # asyncio loops run separate to our stack.
@@ -208,6 +171,39 @@ class Toolbox(object):
             # they aren't important
 
             await self.exec_command(frame)
+
+    ##################################
+    # WRAPPER FUNCTIONS
+    ##################################
+
+    async def say(self, message, *args, **kwargs):
+        await self.client.send_message(get_internal('_channel'), message, *args, **kwargs)
+
+    async def tell(self, *args, **kwargs):
+        await self.client.send_message(get_internal('_author'), *args, **kwargs)
+
+    async def upload(self, f, *args, **kwargs):
+        await self.client.send_file(self.channel, f, *args, **kwargs)
+
+    async def delete(self, *args, **kwargs):
+        await self.client.delete_message(*args, **kwargs)
+
+    async def edit(self, *args, **kwargs):
+        await self.client.edit_message(*args, **kwargs)
+
+    async def attach(self, *args, **kwargs):
+        await self.client.send_file(*args, **kwargs)
+
+    def get_history(self, **kwargs):
+        return self.client.logs_from(get_internal('_channel'), **kwargs)
+
+    @property
+    def uptime(self):
+        return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+
+    def has_perm(self, user, perm_list):
+        perm = get_internal('_channel').permissions_for(user)
+        return all(getattr(perm, x, False) for x in perm_list)
 
     ##################################
     # CORE COMMANDS
