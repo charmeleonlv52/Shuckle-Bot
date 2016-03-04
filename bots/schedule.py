@@ -72,7 +72,7 @@ class ScheduleBot(object):
         self.tasks = TaskTable()
 
     def setup(self):
-        table_path = os.path.join(self.client.__DATA__, 'task_table.json')
+        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
 
         if not os.path.isfile(table_path):
             return
@@ -172,7 +172,7 @@ class ScheduleBot(object):
             pass
 
     def save_schedule(self):
-        table_path = os.path.join(self.client.__DATA__, 'task_table.json')
+        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
 
         with FileLock(table_path) as f:
             pickle.dump(self.tasks.tasks, f, pickle.HIGHEST_PROTOCOL)

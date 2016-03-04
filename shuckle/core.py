@@ -115,7 +115,7 @@ class Toolbox(object):
                 # with no group. All of them are core
                 # commands.
                 if frame.cmd is None:
-                    await self.help(message)
+                    await self.help(frame)
 
                 if frame.group in self.commands:
                     command = self.commands[frame.group][frame.cmd]
@@ -210,14 +210,14 @@ class Toolbox(object):
     # CORE COMMANDS
     ##################################
 
-    async def help(self, message):
+    async def help(self, frame):
         '''
         Display general information about Shuckle:
         @{bot_name} help|about|info
         '''
-        if any(message.group == x for x in ['help', 'about', 'info']):
+        if any(frame.group == x for x in ['help', 'about', 'info']):
             await self.say(
-                message.channel,
+                frame.channel,
                 config.description.format(
                     bot_name=self.user.name,
                     uptime=self.uptime,
