@@ -129,7 +129,7 @@ class ScheduleBot(object):
         task = Task(frame.server, frame.channel, frame.args, frame)
 
         if not self.tasks.delete_task(task):
-            raise ShuckleError('This task does not exist.')
+            self.client.say('This task does not exist.')
 
         self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
