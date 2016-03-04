@@ -10,7 +10,7 @@ class GeneralBot(object):
         self.client = client
 
     @command()
-    async def permissions(self, frame):
+    async def permissions(self):
         await self.client.say(config.permissions)
 
 bot = GeneralBot

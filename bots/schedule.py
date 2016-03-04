@@ -1,21 +1,21 @@
 import asyncio
-import copy
 from discord.errors import InvalidArgument
-import humanfriendly
+from humanfriendly import format_timespan
 import os
 import pickle
 
 from shuckle.command import command, parse_cmd
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
+from shuckle.frame import Frame
+from shuckle.types import Timespan
 from shuckle.util import gen_help, flatten
 
 class Task(object):
-    def __init__(self, server, channel, name, frame, task=None):
+    def __init__(self, server, channel, name, frame, task):
         self.server = server
         self.channel = channel
         self.name = name
-        self.task = task
         self.frame = frame
 
 class TaskTable(object):
@@ -38,9 +38,14 @@ class TaskTable(object):
 
         self.tasks[server][channel][name] = task
 
-    def delete_task(self, task):
+    def delete_task(self, server, channel, name):
+        if hasattr(server, 'id'):
+            server = server.id
+        if hasattr(channel, 'id'):
+            channel = channel.id
+
         try:
-            del self.tasks[task.server.id][task.channel.id][task.name]
+            del self.tasks[server][channel][name]
         except KeyError:
             return False
         return True
@@ -57,6 +62,11 @@ class TaskTable(object):
             return None
 
     def list_tasks(self, server, channel):
+        if hasattr(server, 'id'):
+            server = server.id
+        if hasattr(channel, 'id'):
+            channel = channel.id
+
         try:
             return self.tasks[server][channel].items()
         except KeyError:
@@ -96,7 +106,7 @@ class ScheduleBot(object):
         self.announce = True
 
     @command()
-    async def help(self, frame):
+    async def help(self):
         '''
         Show schedule commands:
         ```
@@ -106,7 +116,7 @@ class ScheduleBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(perm=['manage_messages'])
-    async def list(self, frame):
+    async def list(self, frame : Frame):
         '''
         Lists all scheduled tasks to run in the current chanenl [U:MM]:
         ```
@@ -119,42 +129,34 @@ class ScheduleBot(object):
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
     @command(perm=['manage_messages'])
-    async def delete(self, frame):
+    async def delete(self, frame : Frame, task : str):
         '''
         Removes a task from the scheduler [U:MM]:
         ```
         @{bot_name} schedule delete <task name>
         ```
         '''
-        task = Task(frame.server, frame.channel, frame.args, frame)
-
-        if not self.tasks.delete_task(task):
+        if not self.tasks.delete_task(frame.server, frame.channel, task):
             raise ShuckleError('This task does not exist.')
 
         self.save_schedule()
-        await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
+        await self.client.say('The task "{}" has been unscheduled.'.format(task))
 
     @command(perm=['manage_messages'])
-    async def add(self, frame):
+    async def add(self, frame : Frame, name : str, delay : Timespan, command):
         '''
         Adds a task to run at a set interval [U:MM]:
         ```
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
         '''
-        original_frame = copy.deepcopy(frame)
-        name, delay, rest = parse_cmd(frame.args)
-        group, cmd, args = parse_cmd(rest)
-        sdelay = humanfriendly.parse_timespan(delay)
-
-        original_command = frame.args
+        command = ' '.join(command)
+        original_command = frame.message
+        frame.parent = self.add
+        delay = delay.duration
 
         if self.tasks.get_task(frame.server, frame.channel, name):
             raise ShuckleError('This task already exists.')
-
-        frame.group = group
-        frame.cmd = cmd
-        frame.args = args
 
         async def do_task():
             await self.client.exec_command(frame)
@@ -164,14 +166,18 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        task = Task(frame.server, frame.channel, name, original_frame, original_command)
+        task = Task(frame.server, frame.channel, name, frame, original_command)
 
         asyncio.ensure_future(do_task())
         self.tasks.add_task(task)
         self.save_schedule()
 
         if self.announce:
-            raise ShuckleError('The task "{}" has been scheduled to be run every {}.'.format(name, delay))
+            self.client.say(
+                'The task "{}" has been scheduled to be run every {}.'.format(
+                    name, format_timespan(delay)
+                )
+            )
 
         try:
             loop.run_forever()

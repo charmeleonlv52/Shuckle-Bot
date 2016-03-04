@@ -1,6 +1,7 @@
 import asyncio
-from discord import Client, errors
+from discord import Client, errors, User
 import humanfriendly
+import inspect
 import os
 import sys
 from time import time
@@ -11,6 +12,8 @@ from secrets import secrets
 
 from .error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
 from .frame import Frame
+from .tokenizer import Tokenizer
+from .transform import transform_bool, transform_timespan
 from .util import get_internal
 
 class Toolbox(object):
@@ -119,6 +122,52 @@ class Toolbox(object):
 
         self.client.run(email, password)
 
+    def remove_prefix(self, message):
+        '''
+        Attempts to remove the calling prefix from a message.
+        Returns True if it was removed (Shuckle was called).
+        Returns False if it was not (Shuckle was not called).
+        '''
+        mention_text = '@{} '.format(self.user.name)
+        mention = message.content.startswith(self.user.mention)
+
+        if mention or message.content.startswith(self.__PREFIX__):
+            if mention:
+                message.clean_content = message.clean_content.replace(mention_text, '', 1)
+                message.content = message.content.replace(self.user.mention, '', 1)
+            else:
+                message.clean_content = message.clean_content.replace(self.__PREFIX__, '', 1)
+                message.content = message.content.replace(self.__PREFIX__, '', 1)
+
+            return True
+        return False
+
+    def _gen_args(frame, tokens, command):
+        func = command.func
+        signature = insepct.signature(func)
+        args = []
+
+        for param in signature.parameters:
+            if param.annotation == param.empty:
+                args.append(tokens.next())
+            elif type(param.annotation) is int:
+                args.append(int(tokens.next()))
+            elif type(param.annotation) is bool:
+                args.append(transform_bool(tokens.next()))
+            elif type(param.annotation) is Member:
+                user_id = get_id(tokens.next())
+                args.append(frame.server.get_member(user_id))
+            elif type(param.annotation) is Timespan:
+                args.append(transform_timespan(tokens.next()))
+            elif type(param.annotation) is Frame:
+                args.append(frame)
+            elif type(param.annotation) is str:
+                args.append(tokens.next())
+            else:
+                args.append(tokens.swallow())
+
+        return args
+
     async def exec_command(self, frame):
         '''
         Attempt to execute a command given
@@ -132,23 +181,33 @@ class Toolbox(object):
         # in on_message.
         _channel = frame.channel
         _author = frame.author
-        _iden = frame.iden
+
+        tokens = Tokenizer(frame.message)
+        group = tokens.next()
+        cmd = tokens.next()
 
         try:
             try:
                 # There is a limited number of commands
                 # with no group. All of them are core
                 # commands.
-                if frame.cmd is None:
+                if cmd is None:
                     await self.help(frame)
 
-                if frame.group in self.commands:
-                    command = self.commands[frame.group][frame.cmd]
+                if group in self.commands:
+                    command = self.commands[group][cmd]
 
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
                     try:
-                        await command.run(frame)
+                        args = self._gen_args(frame, tokens, command)
+                    except:
+                        # Typically we will want to swallow
+                        # _gen_arg errors because it means and Invalid
+                        # command was issued.
+                        if self.__DEBUG__: traceback.print_exc()
+                    try:
+                        await command.func(*args)
                     except errors.Forbidden:
                         raise ShucklePermissionError()
             except IndexError:
@@ -181,24 +240,11 @@ class Toolbox(object):
 
     # on_message event handler
     async def on_message(self, message):
-        '''
-        Attempt to create an invocation
-        frame for a command then execute it.
-        '''
         if message.author == self.user:
             return
 
-        mention_text = '@{} '.format(self.user.name)
-        mention = message.clean_content.startswith(mention_text)
-
-        if mention or message.content.startswith(self.__PREFIX__):
-            iden = self.user if mention else self.__PREFIX__
-            frame = Frame(message, iden)
-
-            # Swallow help command errors
-            # they aren't important
-
-            await self.exec_command(frame)
+        if self.remove_prefix(message):
+            await self.exec_command(Frame(message))
 
     ##################################
     # WRAPPER FUNCTIONS
@@ -211,16 +257,7 @@ class Toolbox(object):
         await self.client.send_message(get_internal('_author'), *args, **kwargs)
 
     async def upload(self, f, *args, **kwargs):
-        await self.client.send_file(self.channel, f, *args, **kwargs)
-
-    async def delete(self, *args, **kwargs):
-        await self.client.delete_message(*args, **kwargs)
-
-    async def edit(self, *args, **kwargs):
-        await self.client.edit_message(*args, **kwargs)
-
-    async def attach(self, *args, **kwargs):
-        await self.client.send_file(*args, **kwargs)
+        await self.client.send_file(get_internal('_channel'), f, *args, **kwargs)
 
     def get_history(self, **kwargs):
         return self.client.logs_from(get_internal('_channel'), **kwargs)

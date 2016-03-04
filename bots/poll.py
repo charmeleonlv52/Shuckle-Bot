@@ -1,5 +1,5 @@
 import asyncio
-import humanfriendly
+from humanfriendly import format_timespan
 import json
 import os
 import pygal
@@ -9,6 +9,7 @@ import traceback
 
 from shuckle.command import command
 from shuckle.error import ShuckleError
+from shuckle.types import Timespan
 from shuckle.util import gen_help
 
 DiscordStyle = Style(
@@ -46,14 +47,16 @@ class Poll(object):
         self.closed = False
 
     def vote(self, option, uid):
+        if option <= 0 or option > len(self.options):
+            return
+
         self.votes[uid] = option
 
     def get_results(self):
         results = [0 for x in self.options]
 
         for x in self.votes:
-            if self.votes[x] >= len(results):
-                results[self.votes[x] - 1] += 1
+            results[self.votes[x] - 1] += 1
 
         if sum(results) == 0:
             return None
@@ -80,7 +83,7 @@ class PollBot(object):
         self.client = client
 
     @command()
-    async def help(self, frame):
+    async def help(self):
         '''
         Shows poll commands:
         ```
@@ -90,19 +93,19 @@ class PollBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def start(self, frame):
+    async def start(self, frame: Frame, title : str, duration : Timespan, options):
         '''
-        Create a new poll in the current channel [B:AF]:
+        Create a new poll in the current channel (does not support user mentions) [B:AF]:
         ```
         @{bot_name} poll start {{
             "title": <string>,
             "duration": <integer|seconds>,
-            "options": [<string>]
+            "options": [<string>] // Note: This is an array of strings not an indicator for optional.
         }}
         ```
-        Shorthand for the above (does not support colons in options) [B:AF]:
+        Shorthand for the above [B:AF]:
         ```
-        @{bot_name} poll make <title>:<duration>:<option>[:<option>]
+        @{bot_name} poll make <title> <duration> <option> [<option>]
         ```
         '''
         # Only one poll per channel
@@ -110,40 +113,30 @@ class PollBot(object):
             raise ShuckleError('This channel already has a poll in progress.')
         try:
             try:
-                data = json.loads(frame.args)
+                data = json.loads(title)
+                title = data['title']
+                duration = data['duration']
+                options = data['options']
             except:
                 # Shorthand
-                try:
-                    data = frame.args.split(':')
-                    duration = int(humanfriendly.parse_timespan(data[1]))
+                duration = duration.duration
 
-                    if self.client.__DEBUG__ and duration > 5 * 60:
-                        return
-
-                    data = {
-                        'title': data[0],
-                        'duration': duration,
-                        'options': data[2:]
-                    }
-                except:
+                if self.client.__DEBUG__ and duration > 5 * 60:
                     return
 
-            poll = Poll(data['title'], data['options'])
+            poll = Poll(title, options)
             self.polls[frame.channel] = poll
 
             # Create poll message and send it
-            poll_msg = '**POLL: {}** - Ends in {}'.format(
-                data['title'],
-                humanfriendly.format_timespan(data['duration'])
-            )
+            poll_msg = '**POLL: {}** - Ends in {}'.format(title, format_timespan(duration))
 
-            for x in range(len(data['options'])):
-                poll_msg += '\n{}. {}'.format(x + 1, data['options'][x])
+            for x in range(len(options):
+                poll_msg += '\n{}. {}'.format(x + 1, options[x])
 
             await self.client.say(poll_msg)
 
             # Sleep for some time
-            await asyncio.sleep(data['duration'])
+            await asyncio.sleep(duration)
 
             if poll.closed:
                 return
@@ -152,7 +145,7 @@ class PollBot(object):
             top = poll.get_top()
 
             if top is not None:
-                chart = make_chart(data['title'], top)
+                chart = make_chart(title, top)
 
                 # Upload chart.
                 with open(chart, 'rb') as f:
@@ -171,7 +164,7 @@ class PollBot(object):
             traceback.print_exc()
 
     @command()
-    async def vote(self, frame):
+    async def vote(self, frame : Frame, option : int):
         '''
         Cast your vote for the current poll:
         ```
@@ -181,15 +174,10 @@ class PollBot(object):
         # Check to see if there's even a poll to vote on
         if not frame.channel in self.polls:
             return
-        try:
-            # Get vote option
-            option = int(frame.args)
-            self.polls[frame.channel].vote(option, frame.author.id)
-        except:
-            traceback.print_exc()
+        self.polls[frame.channel].vote(option, frame.author.id)
 
     @command(perm=['manage_messages'])
-    async def stop(self, frame):
+    async def stop(self, frame : Frame):
         '''
         Delete the current poll and don't show the results [U:MM]:
         ```

@@ -4,6 +4,7 @@ import os
 import time
 
 from shuckle.command import command
+from shuckle.frame import Frame
 from shuckle.util import gen_help
 
 # Arbitrarily large number that we
@@ -23,7 +24,7 @@ class ModBot(object):
         self.client = client
 
     @command()
-    async def help(self, frame):
+    async def help(self):
         '''
         Show mod commands:
         ```
@@ -33,7 +34,7 @@ class ModBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(perm=['manage_messages'])
-    async def clear(self, frame):
+    async def clear(self):
         '''
         Deletes all messages in a channel (potentially slow) [B:MM/B:H/U:MM/U:H]:
         ```
@@ -43,7 +44,7 @@ class ModBot(object):
         await self.prune_channel()
 
     @command(perm=['manage_messages'])
-    async def prune(self, frame):
+    async def prune(self, frame : Frame):
         '''
         Prunes all messages by a user [B:MM/U:MM]:
         ```
@@ -68,7 +69,7 @@ class ModBot(object):
     # Archives an entire channel to a text file
     # and sends it to the calling user.
     @command('archive', perm=['manage_messages', 'read_message_history'])
-    async def archive_channel(self, frame):
+    async def archive_channel(self, frame : Frame):
         '''
         Saves all previous messages in a text file and sends it to the user (15 MB max archive size; potentially slow) [B:MM/B:H/U:MM/U:H]:
         ```

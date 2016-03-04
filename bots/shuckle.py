@@ -4,6 +4,7 @@ import sys
 from config import config
 
 from shuckle.command import command
+from shuckle.frame import Frame
 from shuckle.util import gen_help
 from shuckle.error import ShuckleUserPermissionError
 
@@ -18,7 +19,7 @@ class ShuckleBot(object):
         self.client = client
 
     @command()
-    async def help(self, frame):
+    async def help(self):
         '''
         Shows shuckle commands:
         ```
@@ -28,7 +29,7 @@ class ShuckleBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def restart(self, frame):
+    async def restart(self, frame : Frame):
         '''
         Restarts Shuckle:
         ```
@@ -42,7 +43,7 @@ class ShuckleBot(object):
             raise ShuckleUserPermissionError()
 
     @command()
-    async def reload(self, frame):
+    async def reload(self, frame : Frame):
         '''
         Reloads all Shuckle modules:
         ```

@@ -1,4 +1,5 @@
 import inspect
+import re
 from textwrap import dedent
 
 GENERIC_HELP = '''
@@ -57,3 +58,10 @@ def flatten(d):
             flat.append(d[key])
 
     return flat
+
+def get_id(s):
+    '''
+    Returns an ID extracted from mention text.
+    '''
+    match = re.search(r'(<@\d+?>)', s)
+    return match.group(0)

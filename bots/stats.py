@@ -4,6 +4,14 @@ from psutil import virtual_memory
 from shuckle.command import command
 from shuckle.util import gen_help
 
+STATS_DETAIL = """
+__Stats for Geeks:__
+Uptime: {uptime}
+Total Memory: {total_mem}
+Used Memory: {used_mem}
+Connected Servers: {server_count}
+"""
+
 class StatBot(object):
     '''
     **Stat Bot**
@@ -15,7 +23,7 @@ class StatBot(object):
         self.client = client
 
     @command()
-    async def help(self, frame):
+    async def help(self):
         '''
         Show stat commands:
         ```
@@ -25,7 +33,7 @@ class StatBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def show(self, frame):
+    async def show(self):
         '''
         Show Shuckle statistics:
         ```
