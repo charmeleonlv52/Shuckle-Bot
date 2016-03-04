@@ -77,9 +77,8 @@ class ScheduleBot(object):
         if not os.path.isfile(table_path):
             return
 
-        with FileLock(table_path)
-
-        contents = read_binary(table_path)
+        with FileLock(table_path) as f:
+            contents = pickle.load(f)
 
         if contents:
             ghost_table = pickle.loads(contents)
