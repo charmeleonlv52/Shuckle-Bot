@@ -91,7 +91,7 @@ class ModBot(object):
 
             f.flush()
 
-            channel = str(frake.channel).replace(' ', '-')
+            channel = str(frame.channel).replace(' ', '-')
             server = str(frame.server).replace(' ', '-')
 
             filename = '{}.{}-{}.txt'.format(server, channel, now)

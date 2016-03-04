@@ -1,5 +1,5 @@
 import asyncio
-from config import DESCRIPTION
+from config import config
 from discord import Client, errors
 from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
 import humanfriendly
@@ -220,7 +220,7 @@ class Toolbox(object):
         if any(message.group == x for x in ['help', 'about', 'info']):
             await self.say(
                 message.channel,
-                DESCRIPTION.format(
+                config.description.format(
                     bot_name=self.user.name,
                     uptime=self.uptime,
                     bot_list=', '.join(sorted(self.commands.keys())),

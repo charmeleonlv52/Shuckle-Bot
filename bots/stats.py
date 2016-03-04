@@ -14,7 +14,7 @@ class StatBot(object):
         self.client = client
 
     @command()
-    async def help(self, message):
+    async def help(self, frame):
         '''
         Show stat commands:
         ```
@@ -24,15 +24,16 @@ class StatBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def show(self, message):
+    async def show(self, frame):
         '''
         Show Shuckle statistics:
         ```
         @{bot_name} stats show
         ```
         '''
-        used_mem = virtual_memory().used
-        total_mem = virtual_memory().total
+        virt = virtual_memory()
+        used_mem = virt.used
+        total_mem = virt.total
 
         await self.client.say(
             STATS_DETAIL.strip().format(

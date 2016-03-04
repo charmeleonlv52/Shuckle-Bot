@@ -20,9 +20,3 @@ class Frame(object):
             self.mentions.remove(self.iden)
 
         self.group, self.cmd, self.args = parse_cmd(content)
-
-'''
-move secrets path to config
-objectify config
-clean up command parsing
-'''

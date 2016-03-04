@@ -1,4 +1,4 @@
-from config import OWNER_ID
+from config import config
 import os
 from shuckle.command import command
 from shuckle.util import gen_help
@@ -16,7 +16,7 @@ class OwnerBot(object):
         self.client = client
 
     @command()
-    async def help(self, message):
+    async def help(self, frame):
         '''
         Shows owner commands:
         ```
@@ -26,14 +26,14 @@ class OwnerBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def restart(self, message):
+    async def restart(self, frame):
         '''
         Restarts Shuckle:
         ```
         @{bot_name} owner restart
         ```
         '''
-        if message.author.id == OWNER_ID:
+        if frame.author.id == config.owner_id:
             os.execv(os.path.join(self.client.__MAIN__), sys.argv)
         else:
             raise ShuckleUserPermissionError()

@@ -1,6 +1,6 @@
 #!/usr/bin/python3.5
 
-from config import BOTS_FOLDER, PREFIX
+from config import config
 from discord import Client
 import os
 from secrets import secrets
@@ -16,13 +16,13 @@ else:
 __BASE__ = os.path.abspath(os.path.dirname(__file__))
 __MAIN__ = os.path.abspath(__file__)
 __SHUCKLE__ = os.path.join(__BASE__, 'shuckle')
-__BOTS__ = os.path.join(__BASE__, BOTS_FOLDER)
+__BOTS__ = os.path.join(__BASE__, config.bots_folder)
 
 sys.path.append(__SHUCKLE__)
 
 from shuckle.core import Toolbox
 
-client = Toolbox(base=__BASE__, main=__MAIN__, bots=__BOTS__, prefix=PREFIX, debug=__DEBUG__)
+client = Toolbox(base=__BASE__, main=__MAIN__, bots=__BOTS__, prefix=config.prefix, debug=__DEBUG__)
 
 if __name__ == '__main__':
     print('Starting up...')

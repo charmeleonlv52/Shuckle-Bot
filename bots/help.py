@@ -1,4 +1,4 @@
-from config import PERMISSIONS
+from config import config
 from shuckle.command import command
 
 class GeneralBot(object):
@@ -9,9 +9,7 @@ class GeneralBot(object):
         self.client = client
 
     @command()
-    async def permissions(self, message):
-        await self.client.say(
-            PERMISSIONS
-        )
+    async def permissions(self, frame):
+        await self.client.say(config.permissions)
 
 bot = GeneralBot

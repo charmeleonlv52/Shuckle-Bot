@@ -78,7 +78,7 @@ class PollBot(object):
         self.client = client
 
     @command()
-    async def help(self, message):
+    async def help(self, frame):
         '''
         Shows poll commands:
         ```
@@ -88,7 +88,7 @@ class PollBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def make(self, message):
+    async def make(self, frame):
         '''
         Create a new poll in the current channel [B:AF]:
         ```
@@ -104,17 +104,15 @@ class PollBot(object):
         ```
         '''
         # Only one poll per channel
-        if message.channel in self.polls:
+        if frame.channel in self.polls:
             return
         try:
-            data = message.args
-
             try:
-                data = json.loads(data)
+                data = json.loads(frame.args)
             except:
                 # Shorthand
                 try:
-                    data = data.split(':')
+                    data = frame.args.split(':')
                     duration = int(humanfriendly.parse_timespan(data[1]))
 
                     if self.client.__DEBUG__ and duration > 5 * 60:
@@ -129,7 +127,7 @@ class PollBot(object):
                     return
 
             poll = Poll(data['title'], data['options'])
-            self.polls[message.channel] = poll
+            self.polls[frame.channel] = poll
 
             # Create poll message and send it
             poll_msg = '**POLL: {}** - Ends in {}'.format(
@@ -165,22 +163,13 @@ class PollBot(object):
             else:
                 await self.client.say('**POLL: {}** - No Results'.format(data['title']))
 
-            '''
-            poll_msg = '**POLL: {}** - Results'.format(data['title'])
-
-            for x in range(len(top)):
-                poll_msg += '\n{}. {} ({})'.format(x + 1, top[x][0], top[x][1])
-
-            await self.client.say(poll_msg)
-            '''
-
             # Delete current poll to allow a new one
-            del self.polls[message.channel]
+            del self.polls[frame.channel]
         except:
             traceback.print_exc()
 
     @command()
-    async def vote(self, message):
+    async def vote(self, frame):
         '''
         Cast your vote for the current poll:
         ```
@@ -188,17 +177,17 @@ class PollBot(object):
         ```
         '''
         # Check to see if there's even a poll to vote on
-        if not message.channel in self.polls:
+        if not frame.channel in self.polls:
             return
         try:
             # Get vote option
-            option = int(message.args)
-            self.polls[message.channel].vote(option, message.author.id)
+            option = int(frame.args)
+            self.polls[frame.channel].vote(option, frame.author.id)
         except:
             traceback.print_exc()
 
     @command(perm=['manage_messages'])
-    async def delete(self, message):
+    async def delete(self, frame):
         '''
         Delete the current poll and don't show the results [U:MM]:
         ```
@@ -206,8 +195,8 @@ class PollBot(object):
         ```
         '''
         try:
-            self.polls[message.channel].closed = True
-            del self.polls[message.channel]
+            self.polls[frame.channel].closed = True
+            del self.polls[frame.channel]
         except:
             pass
 
