@@ -2,7 +2,6 @@ import asyncio
 from datetime import datetime
 import os
 from shuckle.command import command
-from tempfile import NamedTemporaryFile
 import time
 from shuckle.util import gen_help
 
@@ -77,8 +76,9 @@ class ModBot(object):
         '''
         history = self.client.get_history(limit=MAX_INT)
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
+        path = os.path.join('/tmp', '{}.txt'.format(time.time()))
 
-        with NamedTemporaryFile() as f:
+        with open(path, 'wb+') as f:
             async for x in history:
                 out = '[{}] {}: {}\n'.format(x.timestamp, x.author.name, x.clean_content)
                 out = out.encode('utf-8')
@@ -102,5 +102,8 @@ class ModBot(object):
             content = 'Here is the archive you requested:'
 
             await self.client.attach(frame.author, f, content=content, filename=filename)
+
+        if not self.client.__DEBUG__:
+            os.remove(path)
 
 bot = ModBot
