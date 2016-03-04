@@ -42,7 +42,8 @@ class TaskTable(object):
         try:
             del self.tasks[task.server.id][task.channel.id][task.name]
         except KeyError:
-            raise ShuckleError('This task does not exist.')
+            return False
+        return True
 
     def get_task(self, server, channel, name):
         if hasattr(server, 'id'):
@@ -127,7 +128,8 @@ class ScheduleBot(object):
         '''
         task = Task(frame.server, frame.channel, frame.args, frame)
 
-        self.tasks.delete_task(task)
+        if not self.tasks.delete_task(task):
+            raise ShuckleError('This task does not exist.')
 
         self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
