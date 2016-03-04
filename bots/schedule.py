@@ -79,7 +79,8 @@ class ScheduleBot(object):
         @{bot_name} schedule list
         ```
         '''
-        task_list = map(lambda x, y: '{}: {}'.format(x, y), self.tasks.list_tasks())
+        server, channel = frame.server, frame.channel
+        task_list = map(lambda x, y: '{}: {}'.format(x, y), self.tasks.list_tasks(server, channel))
         task_list = '\n'.join(task_list)
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 

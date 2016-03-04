@@ -91,6 +91,10 @@ class ModBot(object):
 
             f.flush()
 
+            # Reset file pointer to beginning so
+            # we don't send an empty file.
+            f.seek(0)
+
             channel = str(frame.channel).replace(' ', '-')
             server = str(frame.server).replace(' ', '-')
 
@@ -99,6 +103,7 @@ class ModBot(object):
 
             await self.client.attach(frame.author, f, content=content, filename=filename)
 
-        os.remove(path)
+        if not self.client.__DEBUG__:
+            os.remove(path)
 
 bot = ModBot
