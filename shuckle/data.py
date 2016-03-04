@@ -2,8 +2,12 @@ from fcntl import lockf, LOCK_EX, LOCK_UN
 import os
 
 class FileLock(object):
-    def __enter__(self, path, mode='wb+'):
-        self.f = open(path, mode)
+    def __init__(self, path, mode='wb+'):
+        self.path = path
+        self.mode = mode
+
+    def __enter__(self):
+        self.f = open(self.path, self.mode)
 
         lockf(self.f, LOCK_EX)
         return f
