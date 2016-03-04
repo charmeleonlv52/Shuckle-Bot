@@ -127,11 +127,8 @@ class ScheduleBot(object):
         '''
         task = Task(frame.server, frame.channel, frame.args, frame)
 
-        try:
-            self.tasks.delete_task(task)
-        except ShuckleError as e:
-            raise e
-
+        self.tasks.delete_task(task)
+        
         self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(frame.args))
 

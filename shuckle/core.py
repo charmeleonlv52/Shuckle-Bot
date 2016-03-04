@@ -126,8 +126,6 @@ class Toolbox(object):
                         await command.run(frame)
                     except errors.Forbidden:
                         raise ShucklePermissionError()
-                    except Exception as e:
-                        raise e
             except IndexError:
                 pass
             except KeyError:
