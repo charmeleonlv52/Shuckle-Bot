@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from discord import Member
 import os
 import time
 
@@ -44,7 +45,7 @@ class ModBot(object):
         await self.prune_channel()
 
     @command(perm=['manage_messages'])
-    async def prune(self, frame : Frame):
+    async def prune(self, member : Member):
         '''
         Prunes all messages by a user [B:MM/U:MM]:
         ```
@@ -54,7 +55,7 @@ class ModBot(object):
         mentions = frame.mentions
 
         await self.prune_channel(
-            func=lambda x: x.author in mentions
+            func=lambda x: x.author is member
         )
 
     # Deletes all previous messages in a specified

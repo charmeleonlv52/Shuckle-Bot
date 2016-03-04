@@ -9,6 +9,7 @@ import traceback
 
 from shuckle.command import command
 from shuckle.error import ShuckleError
+from shuckle.frame import Frame
 from shuckle.types import Timespan
 from shuckle.util import gen_help
 
@@ -130,7 +131,7 @@ class PollBot(object):
             # Create poll message and send it
             poll_msg = '**POLL: {}** - Ends in {}'.format(title, format_timespan(duration))
 
-            for x in range(len(options):
+            for x in range(len(options)):
                 poll_msg += '\n{}. {}'.format(x + 1, options[x])
 
             await self.client.say(poll_msg)

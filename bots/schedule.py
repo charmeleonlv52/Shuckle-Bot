@@ -4,7 +4,7 @@ from humanfriendly import format_timespan
 import os
 import pickle
 
-from shuckle.command import command, parse_cmd
+from shuckle.command import command
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
@@ -17,6 +17,7 @@ class Task(object):
         self.channel = channel
         self.name = name
         self.frame = frame
+        self.task = task
 
 class TaskTable(object):
     def __init__(self, tasks={}):
@@ -153,6 +154,7 @@ class ScheduleBot(object):
         command = ' '.join(command)
         original_command = frame.message
         frame.parent = self.add
+        frame.message = command
         delay = delay.duration
 
         if self.tasks.get_task(frame.server, frame.channel, name):
@@ -160,7 +162,7 @@ class ScheduleBot(object):
 
         async def do_task():
             await self.client.exec_command(frame)
-            await asyncio.sleep(sdelay)
+            await asyncio.sleep(delay)
 
             if self.tasks.get_task(frame.server, frame.channel, name):
                 asyncio.ensure_future(do_task())

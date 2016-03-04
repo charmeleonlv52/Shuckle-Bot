@@ -8,10 +8,10 @@ class Command(object):
     '''
     A class used to represent a Shuckle command.
     '''
-    def __init__(self, cmd, func, perm=[]):
+    def __init__(self, cmd, perm=[]):
         self.cmd = cmd
-        self.func = func
         self.user_perm = perm
+        self.func = None
 
     def __repr__(self):
         return json.dumps({
@@ -29,6 +29,6 @@ def command(cmd=None, perm=[]):
         else:
             command = cmd
 
-        func._shuckle_command = Command(command, func, perm)
+        func._shuckle_command = Command(command, perm)
         return func
     return dec

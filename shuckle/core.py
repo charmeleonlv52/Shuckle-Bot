@@ -1,5 +1,5 @@
 import asyncio
-from discord import Client, errors, User
+from discord import Client, errors, Member
 import humanfriendly
 import inspect
 import os
@@ -14,6 +14,7 @@ from .error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionEr
 from .frame import Frame
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
+from .types import Timespan
 from .util import get_internal
 
 class Toolbox(object):
@@ -33,8 +34,11 @@ class Toolbox(object):
         self.client = Client()
         self.user = None
 
-        setattr(self.client, 'on_ready', self.on_ready)
-        setattr(self.client, 'on_message', self.on_message)
+        self.client.on_ready = self.on_ready
+        self.client.on_message = self.on_message
+
+        self.delete = self.client.delete_message
+        self.attach = self.client.send_file
 
     def _try_load(self, bot):
         '''
@@ -128,40 +132,39 @@ class Toolbox(object):
         Returns True if it was removed (Shuckle was called).
         Returns False if it was not (Shuckle was not called).
         '''
-        mention_text = '@{} '.format(self.user.name)
         mention = message.content.startswith(self.user.mention)
+        prefix = message.content.startswith(self.__PREFIX__)
 
-        if mention or message.content.startswith(self.__PREFIX__):
+        if mention or prefix:
             if mention:
-                message.clean_content = message.clean_content.replace(mention_text, '', 1)
                 message.content = message.content.replace(self.user.mention, '', 1)
             else:
-                message.clean_content = message.clean_content.replace(self.__PREFIX__, '', 1)
                 message.content = message.content.replace(self.__PREFIX__, '', 1)
 
             return True
         return False
 
-    def _gen_args(frame, tokens, command):
+    def _gen_args(self, frame, tokens, command):
         func = command.func
-        signature = insepct.signature(func)
+        signature = inspect.signature(func)
         args = []
 
         for param in signature.parameters:
-            if param.annotation == param.empty:
-                args.append(tokens.next())
-            elif type(param.annotation) is int:
+            param = signature.parameters[param]
+            annotation = param.annotation
+
+            if annotation is int:
                 args.append(int(tokens.next()))
-            elif type(param.annotation) is bool:
+            elif annotation is bool:
                 args.append(transform_bool(tokens.next()))
-            elif type(param.annotation) is Member:
+            elif annotation is Member:
                 user_id = get_id(tokens.next())
                 args.append(frame.server.get_member(user_id))
-            elif type(param.annotation) is Timespan:
+            elif annotation is Timespan:
                 args.append(transform_timespan(tokens.next()))
-            elif type(param.annotation) is Frame:
+            elif annotation is Frame:
                 args.append(frame)
-            elif type(param.annotation) is str:
+            elif annotation is str:
                 args.append(tokens.next())
             else:
                 args.append(tokens.swallow())
@@ -199,6 +202,9 @@ class Toolbox(object):
 
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
+
+                    args = []
+
                     try:
                         args = self._gen_args(frame, tokens, command)
                     except:
@@ -274,17 +280,16 @@ class Toolbox(object):
     # CORE COMMANDS
     ##################################
 
-    async def help(self, frame):
+    async def help(self):
         '''
         Display general information about Shuckle:
         @{bot_name} help|about|info
         '''
-        if any(frame.group == x for x in ['help', 'about', 'info']):
-            await self.say(
-                config.description.format(
-                    bot_name=self.user.name,
-                    uptime=self.uptime,
-                    bot_list=', '.join(sorted(self.commands.keys())),
-                    prefix=self.__PREFIX__
-                )
+        await self.say(
+            config.description.format(
+                bot_name=self.user.name,
+                uptime=self.uptime,
+                bot_list=', '.join(sorted(self.commands.keys())),
+                prefix=self.__PREFIX__
             )
+        )

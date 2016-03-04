@@ -1,8 +1,8 @@
-from shlex import Shlex
+from shlex import shlex
 
 class Tokenizer(object):
     def __init__(self, s):
-        self.tokens = Shlex(s)
+        self.tokens = shlex(s, posix=True)
         self.tokens.whitespace_split = True
 
         token = self.tokens.get_token()
