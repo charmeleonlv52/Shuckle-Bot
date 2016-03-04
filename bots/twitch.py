@@ -13,7 +13,11 @@ class TwitchBot(object):
         self.client = client
         self.to_check = {}
 
+<<<<<<< Updated upstream
     def setup(self):
+=======
+    async def setup(self):
+>>>>>>> Stashed changes
         '''
         for each stream to check:
             if streaming:
