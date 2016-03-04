@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 import os
 from shuckle.command import command
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 import time
 from shuckle.util import gen_help
 
@@ -78,7 +78,7 @@ class ModBot(object):
         history = self.client.get_history(limit=MAX_INT)
         now = datetime.utcnow().strftime('%m-%d-%y-%H%M%S')
 
-        with TemporaryFile() as f:
+        with NamedTemporaryFile() as f:
             async for x in history:
                 out = '[{}] {}: {}\n'.format(x.timestamp, x.author.name, x.clean_content)
                 out = out.encode('utf-8')
