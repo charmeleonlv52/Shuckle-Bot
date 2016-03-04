@@ -10,8 +10,8 @@ class Example(object):
 	def __init__(self, client):
 		self.client = client
 
-	@command
-	async def hello(self, message):
-		await self.client.say('hello {}'.format(message.author))
+	@command()
+	async def hello(self, frame):
+		await self.client.say('hello {}'.format(frame.author.name))
 
 bot = Example

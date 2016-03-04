@@ -90,11 +90,11 @@ class PollBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def make(self, frame):
+    async def start(self, frame):
         '''
         Create a new poll in the current channel [B:AF]:
         ```
-        @{bot_name} poll make {{
+        @{bot_name} poll start {{
             "title": <string>,
             "duration": <integer|seconds>,
             "options": [<string>]
@@ -189,11 +189,11 @@ class PollBot(object):
             traceback.print_exc()
 
     @command(perm=['manage_messages'])
-    async def delete(self, frame):
+    async def stop(self, frame):
         '''
         Delete the current poll and don't show the results [U:MM]:
         ```
-        @{bot_name} poll delete
+        @{bot_name} poll stop
         ```
         '''
         try:

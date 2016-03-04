@@ -4,6 +4,17 @@ class Frame(object):
     '''
     A class that represents the state of a command
     at its time of invocation.
+
+    Properties:
+        message: The message used to construct the Frame
+        author: The author of the message
+        channel: The channel of invocation
+        server: The server of invocation
+        mentions: A list of mentions in the message without
+                  the calling mention (if applicable)
+        group: The command group
+        cmd: The command itself
+        args: All command arguments as they appear in the message
     '''
     def __init__(self, message, iden):
         self.iden = iden
