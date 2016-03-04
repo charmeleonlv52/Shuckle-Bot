@@ -217,7 +217,6 @@ class Toolbox(object):
         '''
         if any(frame.group == x for x in ['help', 'about', 'info']):
             await self.say(
-                frame.channel,
                 config.description.format(
                     bot_name=self.user.name,
                     uptime=self.uptime,
