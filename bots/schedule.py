@@ -44,6 +44,9 @@ class TaskTable(object):
             raise ShuckleError('This task does not exist.')
 
     def get_task(self, server, channel, name):
+        if hasattr(server, 'name'):
+            server = server.name
+        if hasattr(channel, 'name'):
         try:
             return self.tasks[server][channel][name]
         except KeyError:
@@ -101,7 +104,7 @@ class ScheduleBot(object):
         ```
         '''
         server, channel = frame.server.name, frame.channel.name
-        task_list = map(lambda x: '{}: {}'.format(x[0], x[1]), self.tasks.list_tasks(server, channel))
+        task_list = map(lambda x: '{}: {}'.format(x[0], x[1].task), self.tasks.list_tasks(server, channel))
         task_list = '\n'.join(task_list)
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
@@ -127,7 +130,7 @@ class ScheduleBot(object):
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
         '''
-        original_frame = copy.deep_copy(frame)
+        original_frame = copy.deepcopy(frame)
         name, delay, rest = parse_cmd(frame.args)
         group, cmd, args = parse_cmd(rest)
         sdelay = humanfriendly.parse_timespan(delay)
@@ -150,7 +153,7 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        task = Task(frame.server, frame.channel, name, origina_frame, original_command)
+        task = Task(frame.server, frame.channel, name, original_frame, original_command)
 
         asyncio.ensure_future(do_task())
         self.tasks.add_task(task)
@@ -164,8 +167,8 @@ class ScheduleBot(object):
             pass
 
     def save_schedule(self):
-        output = pickle.dumps(self.tasks)
+        output = pickle.dumps(self.tasks.tasks)
         table_path = os.path.join(self.client.__DATA__, 'task_table.json')
-        write_file(table_path, output)
+        write_binary(table_path, output)
 
 bot = ScheduleBot
