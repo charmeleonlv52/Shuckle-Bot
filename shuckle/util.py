@@ -34,3 +34,14 @@ def gen_help(bot):
         class_doc=dedent(bot.__doc__).strip(),
         commands=dedent('\n'.join(commands))
     )
+
+def flatten(d):
+    flat = []
+
+    for key in d:
+        if isinstance(d[key], dict):
+            flat.extend(flatten(d[key]))
+        else:
+            flat.append(d[key])
+
+    return flat

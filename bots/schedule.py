@@ -7,7 +7,7 @@ import pickle
 from shuckle.command import command, parse_cmd
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
-from shuckle.util import gen_help
+from shuckle.util import gen_help, flatten
 
 class Task(object):
     def __init__(self, server, channel, name, frame, task=None):
@@ -71,23 +71,21 @@ class ScheduleBot(object):
         self.client = client
         self.tasks = TaskTable()
 
-    def setup(self):
+    async def setup(self):
         table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
 
         if not os.path.isfile(table_path):
             return
 
-        with FileLock(table_path) as f:
-            contents = pickle.load(f)
+        with open(table_path, 'rb') as f:
+            try:
+                ghost_table = pickle.load(f)
+            except:
+                return
 
-        if contents:
-            ghost_table = pickle.loads(contents)
-            print(ghost_table)
-
-            for server in ghost_table.tasks:
-                for channel in ghost_table.tasks[server]:
-                    for task in ghost_table.tasks[server][channel]:
-                        self.add_task(task.frame)
+        if ghost_table:
+            for task in ghost_table:
+                await self.add(task)
 
     @command()
     async def help(self, frame):
@@ -172,8 +170,9 @@ class ScheduleBot(object):
 
     def save_schedule(self):
         table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
+        flat_table = flatten(self.tasks.tasks)
 
-        with FileLock(table_path) as f:
-            pickle.dump(self.tasks.tasks, f, pickle.HIGHEST_PROTOCOL)
+        with FileLock(table_path, 'wb+') as f:
+            pickle.dump(flat_table, f, pickle.HIGHEST_PROTOCOL)
 
 bot = ScheduleBot

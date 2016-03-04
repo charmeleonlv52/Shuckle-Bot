@@ -152,7 +152,7 @@ class Toolbox(object):
         print('Running bot setup functions...')
 
         for bot in self.setup:
-            bot.setup()
+            await bot.setup()
 
         print('Shuckle is ready...')
 
