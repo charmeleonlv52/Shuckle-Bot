@@ -1,4 +1,5 @@
 import asyncio
+import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
 import os
@@ -102,7 +103,7 @@ class ScheduleBot(object):
 
         if ghost_table:
             for task in ghost_table:
-                await self.add(task)
+                await self.client.exec_command(task)
 
         self.announce = True
 
@@ -151,10 +152,11 @@ class ScheduleBot(object):
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
         '''
-        command = ' '.join(command)
         original_command = frame.message
-        frame.parent = self.add
-        frame.message = command
+        original_frame = copy.deepcopy(frame)
+
+        frame.message = ' '.join(command)
+        # frame.parent = self.add
         delay = delay.duration
 
         if self.tasks.get_task(frame.server, frame.channel, name):
@@ -168,7 +170,7 @@ class ScheduleBot(object):
                 asyncio.ensure_future(do_task())
 
         loop = asyncio.get_event_loop()
-        task = Task(frame.server, frame.channel, name, frame, original_command)
+        task = Task(frame.server, frame.channel, name, original_frame, original_command)
 
         asyncio.ensure_future(do_task())
         self.tasks.add_task(task)

@@ -15,7 +15,7 @@ from .frame import Frame
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
 from .types import Timespan
-from .util import get_internal
+from .util import get_id, get_internal
 
 class Toolbox(object):
     def __init__(self, base, main, data, bots, prefix=None, debug=False):

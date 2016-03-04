@@ -52,8 +52,6 @@ class ModBot(object):
         @{bot_name} mod prune <@user>
         ```
         '''
-        mentions = frame.mentions
-
         await self.prune_channel(
             func=lambda x: x.author is member
         )
