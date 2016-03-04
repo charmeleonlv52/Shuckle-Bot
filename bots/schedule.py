@@ -22,8 +22,8 @@ class TaskTable(object):
         self.tasks = tasks
 
     def add_task(self, task):
-        server = task.server.name
-        channel = task.channel.name
+        server = task.server.id
+        channel = task.channel.id
         name = task.name
 
         if server not in self.tasks:
@@ -44,9 +44,11 @@ class TaskTable(object):
             raise ShuckleError('This task does not exist.')
 
     def get_task(self, server, channel, name):
-        if hasattr(server, 'name'):
-            server = server.name
-        if hasattr(channel, 'name'):
+        if hasattr(server, 'id'):
+            server = server.id
+        if hasattr(channel, 'id'):
+            channel = channel.id
+
         try:
             return self.tasks[server][channel][name]
         except KeyError:
@@ -103,7 +105,7 @@ class ScheduleBot(object):
         @{bot_name} schedule list
         ```
         '''
-        server, channel = frame.server.name, frame.channel.name
+        server, channel = frame.server.id, frame.channel.id
         task_list = map(lambda x: '{}: {}'.format(x[0], x[1].task), self.tasks.list_tasks(server, channel))
         task_list = '\n'.join(task_list)
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
