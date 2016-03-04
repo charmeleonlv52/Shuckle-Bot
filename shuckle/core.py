@@ -123,7 +123,10 @@ class Toolbox(object):
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
                     try:
-                        await command.run(frame)
+                        result = await command.run(frame)
+
+                        if isinstance(result, ShuckleError):
+                            raise result
                     except errors.Forbidden:
                         raise ShucklePermissionError()
             except IndexError:
