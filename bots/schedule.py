@@ -183,7 +183,7 @@ class ScheduleBot(object):
         pickle_data = []
 
         for task in flat_table:
-            picke_data.append(task.frame)
+            pickle_data.append(task.frame)
 
         with FileLock(table_path, 'wb+') as f:
             pickle.dump(pickle_data, f, pickle.HIGHEST_PROTOCOL)
