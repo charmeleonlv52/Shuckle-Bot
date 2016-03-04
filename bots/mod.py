@@ -105,6 +105,9 @@ class ModBot(object):
             await self.client.attach(frame.author, f, content=content, filename=filename)
 
         if not self.client.__DEBUG__:
-            os.remove(path)
+            try:
+                os.remove(path)
+            except:
+                pass
 
 bot = ModBot

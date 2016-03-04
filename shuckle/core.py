@@ -34,6 +34,10 @@ class Toolbox(object):
         setattr(self.client, 'on_message', self.on_message)
 
     def _try_load(self, bot):
+        '''
+        Attempt to load a single bot given
+        an instance of it.
+        '''
         if not hasattr(bot, '__group__'):
             return
         if hasattr(bot, '__disabled__') and bot.__disabled__:
@@ -72,6 +76,9 @@ class Toolbox(object):
             self.teardown.append(bot)
 
     def _load_bots(self):
+        '''
+        Attempt to load all bots in the bots folder.
+        '''
         bots = os.listdir(self.__BOTS__)
 
         for bot in bots:
@@ -89,6 +96,9 @@ class Toolbox(object):
             self._try_load(bot)
 
     def _unload_bots(self):
+        '''
+        Teardown and unload all bots.
+        '''
         for bot in self.teardown:
             bot.teardown()
 
@@ -110,6 +120,10 @@ class Toolbox(object):
         self.client.run(email, password)
 
     async def exec_command(self, frame):
+        '''
+        Attempt to execute a command given
+        its invocation frame.
+        '''
         # Internal variables are set here because
         # asyncio loops run separate to our stack.
         #
@@ -167,6 +181,10 @@ class Toolbox(object):
 
     # on_message event handler
     async def on_message(self, message):
+        '''
+        Attempt to create an invocation
+        frame for a command then execute it.
+        '''
         if message.author == self.user:
             return
 

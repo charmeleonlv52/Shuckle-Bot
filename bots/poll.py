@@ -8,6 +8,7 @@ import time
 import traceback
 
 from shuckle.command import command
+from shuckle.error import ShuckleError
 from shuckle.util import gen_help
 
 DiscordStyle = Style(
@@ -106,7 +107,7 @@ class PollBot(object):
         '''
         # Only one poll per channel
         if frame.channel in self.polls:
-            return
+            raise ShuckleError('This channel already has a poll in progress.')
         try:
             try:
                 data = json.loads(frame.args)
@@ -199,6 +200,6 @@ class PollBot(object):
             self.polls[frame.channel].closed = True
             del self.polls[frame.channel]
         except:
-            pass
+            raise ShuckleError('This channel does not have a poll in progress.')
 
 bot = PollBot

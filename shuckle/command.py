@@ -4,15 +4,16 @@ import json
 Shuckle commands are space delimited.
 '''
 
-'''
-Parses a string as a command.
-
-Returns:
-    - group
-    - cmd
-    - args
-'''
 def parse_cmd(content):
+    '''
+    Parses a string as a command:
+        <group> <cmd> <args...>
+
+    Returns:
+        - group
+        - cmd
+        - args
+    '''
     tokens = content.split(' ')
     group = tokens[0]
 
@@ -29,6 +30,9 @@ def parse_cmd(content):
     return group, cmd, args
 
 class Command(object):
+    '''
+    A class used to represent a Shuckle command.
+    '''
     def __init__(self, cmd, func, perm=[]):
         self.cmd = cmd
         self.func = func
@@ -44,6 +48,9 @@ class Command(object):
         })
 
 def command(cmd=None, owner=False, perm=[]):
+    '''
+    A decorator used to denote a Shuckle command.
+    '''
     def dec(func):
         if cmd is None:
             command = func.__name__

@@ -10,6 +10,10 @@ __Command List:__
 '''
 
 def get_internal(name):
+    '''
+    Returns the value of a Shuckle internal variable.
+    This should only be used by the Shuckle core.
+    '''
     stack = inspect.stack()
 
     try:
@@ -24,6 +28,10 @@ def get_internal(name):
         pass
 
 def gen_help(bot):
+    '''
+    Generates help message text for a given bot
+    using a bot's command docstrings.
+    '''
     commands = []
 
     for x in dir(bot):
@@ -36,6 +44,10 @@ def gen_help(bot):
     )
 
 def flatten(d):
+    '''
+    Flattens a multi-level dictionary into
+    a single dimension list.
+    '''
     flat = []
 
     for key in d:

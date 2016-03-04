@@ -1,6 +1,10 @@
 from .command import parse_cmd
 
 class Frame(object):
+    '''
+    A class that represents the state of a command
+    at its time of invocation.
+    '''
     def __init__(self, message, iden):
         self.iden = iden
 
