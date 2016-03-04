@@ -53,7 +53,7 @@ class ModBot(object):
         ```
         '''
         await self.prune_channel(
-            func=lambda x: x.author is member
+            func=lambda x: x.author==member
         )
 
     # Deletes all previous messages in a specified

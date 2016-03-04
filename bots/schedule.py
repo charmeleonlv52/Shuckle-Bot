@@ -177,7 +177,7 @@ class ScheduleBot(object):
         self.save_schedule()
 
         if self.announce:
-            self.client.say(
+            await self.client.say(
                 'The task "{}" has been scheduled to be run every {}.'.format(
                     name, format_timespan(delay)
                 )
