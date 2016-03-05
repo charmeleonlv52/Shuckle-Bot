@@ -12,9 +12,10 @@ from secrets import secrets
 
 from .error import *
 from .frame import Frame
+from .status import Status
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
-from .types import Timespan
+from .types import Module, Timespan
 from .util import get_id, get_internal
 
 class Toolbox(object):
@@ -33,6 +34,7 @@ class Toolbox(object):
         self.teardown = []
         self.client = Client()
         self.user = None
+        self.status = None
 
         self.core = {
             'help': self.help,
@@ -128,6 +130,9 @@ class Toolbox(object):
 
         if self.__DEBUG__: print(self.commands)
 
+        self.status = Status(self.commands.keys())
+        self.status.load(os.path.join(self.__DATA__, 'module_status.shuckle'))
+
         print('Shuckle is starting...')
 
         self.client.run(email, password)
@@ -169,15 +174,22 @@ class Toolbox(object):
                     args.append(int(tokens.next()))
                 elif annotation is bool:
                     args.append(transform_bool(tokens.next()))
+                elif annotation is str:
+                    args.append(tokens.next())
                 elif annotation is Member:
                     user_id = get_id(tokens.next())
                     args.append(frame.server.get_member(user_id))
                 elif annotation is Timespan:
                     args.append(transform_timespan(tokens.next()))
+                elif annotation is Module:
+                    test = tokens.peek().lower()
+                    if test in self.commands:
+                        args.append(test)
+                        tokens.next()
+                    else:
+                        raise
                 elif annotation is Frame:
                     args.append(frame)
-                elif annotation is str:
-                    args.append(tokens.next())
                 else:
                     args.append(tokens.swallow())
         except:
@@ -206,6 +218,9 @@ class Toolbox(object):
         tokens = Tokenizer(frame.message)
         group = tokens.next()
         cmd = tokens.next()
+
+        if not self.status.is_enabled(group, frame.channel.id):
+            return
 
         try:
             try:
@@ -301,6 +316,12 @@ class Toolbox(object):
     def has_perm(self, user, perm_list):
         perm = get_internal('_channel').permissions_for(user)
         return all(getattr(perm, x, False) for x in perm_list)
+
+    def enable_module(self, module):
+        self.status.enable(module, get_internal('_channel').id)
+
+    def disable_module(self, module):
+        self.status.disable(module, get_internal('_channel').id)
 
     ##################################
     # CORE COMMANDS
