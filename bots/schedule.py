@@ -92,7 +92,7 @@ class ScheduleBot(object):
 
     async def setup(self):
         self.announce = False
-        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
+        table_path = os.path.join(config.__DATA__, 'task_table.shuckle')
 
         if not os.path.isfile(table_path):
             return
