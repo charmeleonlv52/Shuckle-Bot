@@ -108,6 +108,10 @@ class ScheduleBot(object):
 
         self.announce = True
 
+    def teardown(self):
+        save_schedule()
+        self.tasks = TaskTable()
+
     @command()
     async def help(self):
         '''

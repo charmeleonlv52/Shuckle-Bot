@@ -38,17 +38,4 @@ class ShuckleBot(object):
         await self.client.say('Restarting Shuckle...')
         os.execv(os.path.join(self.client.__MAIN__), sys.argv)
 
-    @command(owner=True)
-    async def reload(self, frame : Frame):
-        '''
-        Reloads all Shuckle modules:
-        ```
-        @{bot_name} shuckle reload
-        ```
-        '''
-        self.client._unload_bots()
-        self.client._load_bots()
-
-        await self.client.say('Reloading modules...')
-
 bot = ShuckleBot
