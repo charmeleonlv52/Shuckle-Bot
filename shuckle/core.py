@@ -12,7 +12,7 @@ from secrets import secrets
 
 from .error import *
 from .frame import Frame
-import .module
+from .module import is_enabled
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
 from .types import Module, Timespan
@@ -215,7 +215,7 @@ class Toolbox(object):
         cmd = tokens.next()
 
         # Module not enabled for given channel.
-        if not module.is_enabled(frame.channel.id, group):
+        if not is_enabled(frame.channel.id, group):
             return
 
         try:
