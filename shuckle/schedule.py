@@ -21,6 +21,8 @@ def delete(channel, name):
         except:
             return False
 
-def list():
+def list(channel):
     with session_factory() as sess:
-        tasks = sess.query(Task.task).all()
+        return sess.query(Task.task).filter(
+            Task.channel==channel
+        ).all()
