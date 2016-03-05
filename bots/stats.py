@@ -44,7 +44,7 @@ class StatBot(object):
         '''
         process = Process(os.getpid())
         virt = virtual_memory()
-        py = process.get_memory_info()[0]
+        py = process.memory_info()[0]
         used_mem = virt.used
         total_mem = virt.total
 
