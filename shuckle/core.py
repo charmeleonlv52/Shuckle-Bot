@@ -214,7 +214,8 @@ class Toolbox(object):
         group = tokens.next()
         cmd = tokens.next()
 
-        if not self.status.is_enabled(group, frame.channel.id):
+        # Module not enabled for given channel.
+        if not self.status.is_enabled(frame.channel.id, group):
             return
 
         try:
@@ -311,12 +312,6 @@ class Toolbox(object):
     def has_perm(self, user, perm_list):
         perm = get_internal('_channel').permissions_for(user)
         return all(getattr(perm, x, False) for x in perm_list)
-
-    def enable_module(self, module):
-        self.status.enable(module, get_internal('_channel').id)
-
-    def disable_module(self, module):
-        self.status.disable(module, get_internal('_channel').id)
 
     ##################################
     # CORE COMMANDS
