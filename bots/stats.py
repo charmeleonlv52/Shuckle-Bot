@@ -10,7 +10,7 @@ __Stats for Geeks:__
 Uptime: {uptime}
 Total Memory: {total_mem}
 Used Memory: {used_mem}
-Bot Memory: {py_mem}
+Bot Memory Usage: {py_mem}
 Connected Servers: {server_count}
 """
 
