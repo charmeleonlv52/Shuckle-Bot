@@ -1,7 +1,5 @@
 from humanfriendly import parse_timespan
 
-from .types import Timespan
-
 def transform_bool(s):
     s = s.lower()
     if any(s == x for x in ['yes', 'y', 'true', 't', '1']):
@@ -10,4 +8,4 @@ def transform_bool(s):
         return False
 
 def transform_timespan(s):
-    return Timespan(parse_timespan(s))
+    return parse_timespan(s)

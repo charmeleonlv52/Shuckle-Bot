@@ -28,7 +28,7 @@ class ShuckleBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(owner=True)
-    async def restart(self, frame : Frame):
+    async def restart(self, frame: Frame):
         '''
         Restarts Shuckle:
         ```

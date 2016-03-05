@@ -94,7 +94,7 @@ class PollBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def start(self, frame: Frame, title : str, duration : Timespan, options):
+    async def start(self, frame: Frame, title: str, duration: Timespan, options):
         '''
         Create a new poll in the current channel (does not support user mentions) [B:AF]:
         ```
@@ -165,7 +165,7 @@ class PollBot(object):
             traceback.print_exc()
 
     @command()
-    async def vote(self, frame : Frame, option : int):
+    async def vote(self, frame: Frame, option : int):
         '''
         Cast your vote for the current poll:
         ```
@@ -178,7 +178,7 @@ class PollBot(object):
         self.polls[frame.channel].vote(option, frame.author.id)
 
     @command(perm=['manage_messages'])
-    async def stop(self, frame : Frame):
+    async def stop(self, frame: Frame):
         '''
         Delete the current poll and don't show the results [U:MM]:
         ```

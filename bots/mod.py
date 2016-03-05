@@ -45,7 +45,7 @@ class ModBot(object):
         await self.prune_channel()
 
     @command(perm=['manage_messages'])
-    async def prune(self, member : Member):
+    async def prune(self, member: Member):
         '''
         Prunes all messages by a user [B:MM/U:MM]:
         ```
@@ -68,7 +68,7 @@ class ModBot(object):
     # Archives an entire channel to a text file
     # and sends it to the calling user.
     @command('archive', perm=['manage_messages', 'read_message_history'])
-    async def archive_channel(self, frame : Frame):
+    async def archive_channel(self, frame: Frame):
         '''
         Saves all previous messages in a text file and sends it to the user (15 MB max archive size; potentially slow) [B:MM/B:H/U:MM/U:H]:
         ```
