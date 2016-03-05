@@ -33,6 +33,11 @@ class Toolbox(object):
         self.teardown = []
         self.client = Client()
         self.user = None
+        self.core = {
+            'help': self.help,
+            'info': self.help,
+            'about': self.help
+        }
 
         self.client.on_ready = self.on_ready
         self.client.on_message = self.on_message
@@ -192,12 +197,12 @@ class Toolbox(object):
         try:
             try:
                 # There is a limited number of commands
-                # with no group. All of them are core
-                # commands.
+                # belonging to no group. All of them are core
+                # commands. In this case the group
+                # is the command.
                 if cmd is None:
-                    await self.help(group)
-
-                if group in self.commands:
+                    command = self.core[cmd]
+                elif group in self.commands:
                     command = self.commands[group][cmd]
 
                     if frame.parent == command:
@@ -207,20 +212,22 @@ class Toolbox(object):
                         raise ShuckleUserPermissionError()
                     if command.owner and frame.author.id != config.owner_id:
                         raise ShuckleUserPermissionError()
+                else:
+                    return
 
-                    args = []
+                args = []
 
-                    try:
-                        args = self._gen_args(frame, tokens, command)
-                    except:
-                        # Typically we will want to swallow
-                        # _gen_arg errors because it means and Invalid
-                        # command was issued.
-                        if self.__DEBUG__: traceback.print_exc()
-                    try:
-                        await command.func(*args)
-                    except errors.Forbidden:
-                        raise ShucklePermissionError()
+                try:
+                    args = self._gen_args(frame, tokens, command)
+                except:
+                    # Typically we will want to swallow
+                    # _gen_arg errors because it means and Invalid
+                    # command was issued.
+                    if self.__DEBUG__: traceback.print_exc()
+                try:
+                    await command.func(*args)
+                except errors.Forbidden:
+                    raise ShucklePermissionError()
             except IndexError:
                 pass
             except KeyError:
