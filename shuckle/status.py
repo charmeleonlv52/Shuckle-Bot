@@ -16,14 +16,14 @@ class Status(object):
     def load(self):
         path = os.path.join(config.__DATA__, 'module_status.shuckle')
 
-        if not os.path.isfile(file):
+        if not os.path.isfile(path):
             self.save_status()
 
         self.tracked = json.loads(read_file(path))
 
     def save_status(self):
         path = os.path.join(config.__DATA__, 'module_status.shuckle')
-        write_file(self.path, json.dumps(self.tracked))
+        write_file(path, json.dumps(self.tracked))
 
     def is_enabled(self, module, channel):
         return channel not in self.tracked[module] or self.tracked[module][channel]
