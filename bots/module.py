@@ -9,7 +9,7 @@ class ModuleBot(object):
         self.client = client
 
     @command(perm=['manage_channels'])
-    async def enable(self, frame: frame, module: Module):
+    async def enable(self, frame: Frame, module: Module):
         if enable_module(frame.channel.id, module):
             await self.client.say('The module {} has been enabled.'.format(module))
         else:
