@@ -161,7 +161,6 @@ class ScheduleBot(object):
         original_frame = copy.deepcopy(frame)
 
         frame.message = ' '.join(command)
-        delay = delay.duration
 
         if delay < config.min_delay:
             raise ShuckleError('You must choose a longer interval.')
