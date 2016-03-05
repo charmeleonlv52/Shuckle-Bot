@@ -12,21 +12,17 @@ from secrets import secrets
 
 from .error import *
 from .frame import Frame
+from .module import is_enabled
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
-from .types import Timespan
+from .types import Module, Timespan
 from .util import get_id, get_internal
 
 class Toolbox(object):
-    def __init__(self, base, main, data, bots, prefix=None, debug=False):
+    def __init__(self, debug=False):
         self.start_time = time()
 
         self.__DEBUG__ = debug
-        self.__BASE__ = base
-        self.__MAIN__ = main
-        self.__DATA__ = data
-        self.__BOTS__ = bots
-        self.__PREFIX__ = prefix
 
         self.commands = {}
         self.setup = []
@@ -92,11 +88,11 @@ class Toolbox(object):
         '''
         Attempt to load all bots in the bots folder.
         '''
-        bots = os.listdir(self.__BOTS__)
+        bots = os.listdir(config.__BOTS__)
 
         for bot in bots:
             # Only try importing files
-            if not os.path.isfile(os.path.join(self.__BOTS__, bot)):
+            if not os.path.isfile(os.path.join(config.__BOTS__, bot)):
                 continue
 
             # Remove trailing .py
@@ -139,13 +135,13 @@ class Toolbox(object):
         Returns False if it was not (Shuckle was not called).
         '''
         mention = message.content.startswith(self.user.mention)
-        prefix = message.content.startswith(self.__PREFIX__)
+        prefix = message.content.startswith(config.prefix)
 
         if mention or prefix:
             if mention:
                 message.content = message.content.replace(self.user.mention, '', 1)
             else:
-                message.content = message.content.replace(self.__PREFIX__, '', 1)
+                message.content = message.content.replace(config.prefix, '', 1)
 
             return True
         return False
@@ -169,15 +165,22 @@ class Toolbox(object):
                     args.append(int(tokens.next()))
                 elif annotation is bool:
                     args.append(transform_bool(tokens.next()))
+                elif annotation is str:
+                    args.append(tokens.next())
                 elif annotation is Member:
                     user_id = get_id(tokens.next())
                     args.append(frame.server.get_member(user_id))
                 elif annotation is Timespan:
                     args.append(transform_timespan(tokens.next()))
+                elif annotation is Module:
+                    test = tokens.peek().lower()
+                    if test in self.commands:
+                        args.append(test)
+                        tokens.next()
+                    else:
+                        raise
                 elif annotation is Frame:
                     args.append(frame)
-                elif annotation is str:
-                    args.append(tokens.next())
                 else:
                     args.append(tokens.swallow())
         except:
@@ -206,6 +209,10 @@ class Toolbox(object):
         tokens = Tokenizer(frame.message)
         group = tokens.next()
         cmd = tokens.next()
+
+        # Module not enabled for given channel.
+        if not is_enabled(frame.channel.id, group):
+            return
 
         try:
             try:
@@ -316,6 +323,6 @@ class Toolbox(object):
                 bot_name=self.user.name,
                 uptime=self.uptime,
                 bot_list=', '.join(sorted(self.commands.keys())),
-                prefix=self.__PREFIX__
+                prefix=config.prefix
             )
         )
