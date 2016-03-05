@@ -7,7 +7,7 @@ config = {
         Library: discord.py async beta
         Uptime: {uptime}
 
-        {bot_name} combines many small bots into one super bot and can be called Using @{bot_name} or {prefix}.
+        {bot_name} combines many small bots into one super bot and can be called using `@{bot_name}` or `{prefix}`.
 
         __Installed Modules:__
         {bot_list}
