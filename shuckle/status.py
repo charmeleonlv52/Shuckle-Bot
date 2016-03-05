@@ -14,11 +14,12 @@ class Status(object):
         self.tracked = {x: {} for x in modules}
 
     def load(self):
-        try:
-            path = os.path.join(config.__DATA__, 'module_status.shuckle')
-            self.tracked = json.loads(read_file(path))
-        except:
+        path = os.path.join(config.__DATA__, 'module_status.shuckle')
+
+        if not os.path.isfile(file):
             self.save_status()
+
+        self.tracked = json.loads(read_file(path))
 
     def save_status(self):
         path = os.path.join(config.__DATA__, 'module_status.shuckle')
