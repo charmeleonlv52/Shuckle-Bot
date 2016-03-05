@@ -6,7 +6,7 @@ from shuckle.command import command
 from shuckle.util import gen_help
 
 STATS_DETAIL = """
-__Stats for Geeks:__
+__Shuckle Stats:__
 Uptime: {uptime}
 Total Memory: {total_mem}
 Used Memory: {used_mem}
