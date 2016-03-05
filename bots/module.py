@@ -15,6 +15,16 @@ class ModuleBot(object):
     def __init__(self, client):
         self.client = client
 
+    @command()
+    async def help(self):
+        '''
+        Shows module commands:
+        ```
+        @{bot_name} poll help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
+
     @command(perm=['manage_channels'])
     async def enable(self, frame: Frame, module: Module):
         '''
