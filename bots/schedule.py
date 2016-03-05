@@ -1,4 +1,5 @@
 import asyncio
+from config import config
 import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
