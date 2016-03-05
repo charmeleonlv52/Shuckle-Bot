@@ -102,7 +102,7 @@ class ScheduleBot(object):
             await self.client.exec_command(frame)
             await asyncio.sleep(delay)
 
-            if self.tasks.get_task(frame.server, frame.channel, name):
+            if get_task(frame.channel.id, name):
                 asyncio.ensure_future(do_task())
 
         task = Task(name, frame.message, original_frame)
