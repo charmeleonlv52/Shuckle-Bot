@@ -10,7 +10,7 @@ from shuckle.command import command
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
-from shuckle.schedule import add_task, delete_task, get_task, list_tasks
+from shuckle.schedule import load_schedule, add_task, delete_task, get_task, list_tasks
 from shuckle.types import Timespan
 from shuckle.util import gen_help, flatten
 
@@ -37,7 +37,7 @@ class ScheduleBot(object):
         # while loading task schedule.
         self.announce = False
 
-        ghost_table = schedule.load()
+        ghost_table = load_schedule()
 
         if ghost_table:
             for task in ghost_table:
