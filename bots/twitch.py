@@ -1,6 +1,10 @@
+import aiohttp
 import asyncio
+import json
+import pickle
 
 from shuckle.command import command
+from shuckle.data import FileLock
 
 class Stream(object):
     def __init__(self, user, sub=False):
@@ -9,6 +13,7 @@ class Stream(object):
 
 class TwitchBot(object):
     __group__ = 'twitch'
+    __disabled__ = True
 
     def __init__(self, client):
         self.client = client
