@@ -1,5 +1,6 @@
 from humanfriendly import format_size
-from psutil import virtual_memory
+import os
+from psutil import Process, virtual_memory
 
 from shuckle.command import command
 from shuckle.util import gen_help
@@ -9,6 +10,7 @@ __Stats for Geeks:__
 Uptime: {uptime}
 Total Memory: {total_mem}
 Used Memory: {used_mem}
+Bot Memory: {py_mem}
 Connected Servers: {server_count}
 """
 
@@ -40,13 +42,16 @@ class StatBot(object):
         @{bot_name} stats show
         ```
         '''
+        process = Process(os.getpid())
         virt = virtual_memory()
+        py = process.get_memory_info()[0]
         used_mem = virt.used
         total_mem = virt.total
 
         await self.client.say(
             STATS_DETAIL.strip().format(
                 uptime=self.client.uptime,
+                py_mem=format_size(py),
                 used_mem=format_size(used_mem),
                 total_mem=format_size(total_mem),
                 server_count=self.client.server_count
