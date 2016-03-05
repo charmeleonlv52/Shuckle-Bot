@@ -5,6 +5,8 @@ from shuckle.module import enable_module, disable_module
 from shuckle.types import Module
 
 class ModuleBot(object):
+    __group__ = 'module'
+    
     def __init__(self, client):
         self.client = client
 

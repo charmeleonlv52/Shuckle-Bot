@@ -3,7 +3,7 @@ from .models.task import Task
 
 def load_schedule():
     with session_factory() as sess:
-        return sess.query(Task.task).all()
+        return [x.task for x in sess.query(Task.task).all()]
 
 def add_task(task):
     try:
@@ -14,23 +14,27 @@ def add_task(task):
         return False
 
 def get_task(channel, name):
-    with session_factory() as sess:
-        return sess.query(Task).filter(
-            Task.channel==channel,
-            Task.name==name
-        ).exists()
+    try:
+        with session_factory() as sess:
+            try:
+                return sess.query(Task).filter(
+                    Task.channel==channel,
+                    Task.name==name
+                ).one()
+        except:
+            return None
 
 def delete_task(channel, name):
-    with session_factory() as sess:
-        try:
-            query = sess.query(Task).filter(
-                Task.channel==channel,
-                Task.name==name
-            ).delete()
+    try:
+        with session_factory() as sess:
+                query = sess.query(Task).filter(
+                    Task.channel==channel,
+                    Task.name==name
+                ).delete()
 
-            return True
-        except:
-            return False
+                return True
+    except:
+        return False
 
 def list_tasks(channel):
     with session_factory() as sess:

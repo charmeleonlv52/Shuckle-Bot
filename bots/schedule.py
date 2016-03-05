@@ -30,20 +30,16 @@ class ScheduleBot(object):
 
     def __init__(self, client):
         self.client = client
-        self.announce = True
+        self.loaded = False
 
     async def setup(self):
-        # Suppress all bot messages
-        # while loading task schedule.
-        self.announce = False
-
         ghost_table = load_schedule()
 
         if ghost_table:
             for task in ghost_table:
-                await self.client.exec_command(task)
+                await self.client.exec_command(task.frame)
 
-        self.announce = True
+        self.loaded = True
 
     @command()
     async def help(self):
@@ -90,7 +86,6 @@ class ScheduleBot(object):
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
         '''
-        original_command = frame.message
         original_frame = copy.deepcopy(frame)
 
         frame.message = ' '.join(command)
@@ -100,7 +95,7 @@ class ScheduleBot(object):
         if frame.message.startswith('schedule add'):
             raise ShuckleError('You may not schedule a recursive command.')
 
-        if schedule.get_task(frame.channel.id, name):
+        if self.loaded and get_task(frame.channel.id, name):
             raise ShuckleError('This task already exists.')
 
         async def do_task():
@@ -110,14 +105,9 @@ class ScheduleBot(object):
             if self.tasks.get_task(frame.server, frame.channel, name):
                 asyncio.ensure_future(do_task())
 
-        loop = asyncio.get_event_loop()
-        task = Task(name, original_command, original_frame)
+        task = Task(name, frame.message, original_frame)
 
-        asyncio.ensure_future(do_task())
-
-        try:
-            add_task(task)
-        except:
+        if not add_task(task)
             raise ShuckleError('Unable to schedule task.')
 
         if self.announce:
@@ -128,6 +118,8 @@ class ScheduleBot(object):
             )
 
         try:
+            loop = asyncio.get_event_loop()
+            asyncio.ensure_future(do_task())
             loop.run_forever()
         except:
             pass

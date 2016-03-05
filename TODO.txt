@@ -1,3 +1,4 @@
 - restructure so that Toolbox is less relied on
   for various things by bots
+- clean up schedule bot it's really messy
 - clean up command parsing
