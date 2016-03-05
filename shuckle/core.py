@@ -228,7 +228,7 @@ class Toolbox(object):
                 else:
                     return
 
-                args = self._gen_args(frame, tokens, command)
+                args = self._gen_args(frame, tokens, func)
 
                 try:
                     await func(*args)
