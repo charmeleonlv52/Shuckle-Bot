@@ -14,6 +14,8 @@ elif '-d' in sys.argv:
 else:
     __DEBUG__ = False
 
+# Shuckle adds internal path variables to
+# the config at runtime.
 config.__BASE__ = os.path.abspath(os.path.dirname(__file__))
 config.__MAIN__ = os.path.abspath(__file__)
 config.__DATA__ = os.path.join(config.__BASE__, 'data')
@@ -27,6 +29,6 @@ if __name__ == '__main__':
 
     from shuckle.core import Toolbox
 
-    client = Toolbox(config, __DEBUG__)
+    client = Toolbox(debug=__DEBUG__)
 
     client.run(secrets.email, secrets.password)

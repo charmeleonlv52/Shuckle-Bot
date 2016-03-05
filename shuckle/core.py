@@ -93,7 +93,7 @@ class Toolbox(object):
 
         for bot in bots:
             # Only try importing files
-            if not os.path.isfile(os.path.join(self.__BOTS__, bot)):
+            if not os.path.isfile(os.path.join(config.__BOTS__, bot)):
                 continue
 
             # Remove trailing .py
@@ -126,7 +126,7 @@ class Toolbox(object):
         if self.__DEBUG__: print(self.commands)
 
         self.status = Status(self.commands.keys())
-        self.status.load(os.path.join(self.__DATA__, 'module_status.shuckle'))
+        self.status.load()
 
         print('Shuckle is starting...')
 
