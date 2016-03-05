@@ -6,7 +6,6 @@ from config import config
 from shuckle.command import command
 from shuckle.frame import Frame
 from shuckle.util import gen_help
-from shuckle.error import ShuckleUserPermissionError
 
 class ShuckleBot(object):
     '''
@@ -28,7 +27,7 @@ class ShuckleBot(object):
         '''
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
-    @command()
+    @command(owner=True)
     async def restart(self, frame : Frame):
         '''
         Restarts Shuckle:
@@ -36,13 +35,10 @@ class ShuckleBot(object):
         @{bot_name} shuckle restart
         ```
         '''
-        if frame.author.id == config.owner_id:
-            await self.client.say('Restarting Shuckle...')
-            os.execv(os.path.join(self.client.__MAIN__), sys.argv)
-        else:
-            raise ShuckleUserPermissionError()
+        await self.client.say('Restarting Shuckle...')
+        os.execv(os.path.join(self.client.__MAIN__), sys.argv)
 
-    @command()
+    @command(owner=True)
     async def reload(self, frame : Frame):
         '''
         Reloads all Shuckle modules:
@@ -50,12 +46,9 @@ class ShuckleBot(object):
         @{bot_name} shuckle reload
         ```
         '''
-        if frame.author.id == config.owner_id:
-            self.client._unload_bots()
-            self.client._load_bots()
+        self.client._unload_bots()
+        self.client._load_bots()
 
-            await self.client.say('Reloading modules...')
-        else:
-            raise ShuckleUserPermissionError()
+        await self.client.say('Reloading modules...')
 
 bot = ShuckleBot

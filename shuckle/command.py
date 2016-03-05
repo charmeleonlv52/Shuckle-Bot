@@ -19,7 +19,7 @@ class Command(object):
             'user_perm': self.user_perm
         })
 
-def command(cmd=None, perm=[]):
+def command(cmd=None, owner=False, perm=[]):
     '''
     A decorator used to denote a Shuckle command.
     '''
@@ -29,6 +29,6 @@ def command(cmd=None, perm=[]):
         else:
             command = cmd
 
-        func._shuckle_command = Command(command, perm)
+        func._shuckle_command = Command(command, owner, perm)
         return func
     return dec
