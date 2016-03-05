@@ -6,7 +6,7 @@ from shuckle.types import Module
 
 class ModuleBot(object):
     __group__ = 'module'
-    
+
     def __init__(self, client):
         self.client = client
 
@@ -18,8 +18,8 @@ class ModuleBot(object):
             raise ShuckleError('Unable to enable module.')
 
     @command(perm=['manage_channels'])
-    async def disable(self, module: Module):
-        if disable_module(module):
+    async def disable(self, frame: Frame, module: Module):
+        if disable_module(frame.channel.id, module):
             await self.client.say('The module {} has been disabled.'.format(module))
         else:
             raise ShuckleError('Unable to disable module.')
