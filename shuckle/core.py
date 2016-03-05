@@ -10,7 +10,7 @@ import traceback
 from config import config
 from secrets import secrets
 
-from .error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
+from .error import *
 from .frame import Frame
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
@@ -149,30 +149,42 @@ class Toolbox(object):
             return True
         return False
 
-    def _gen_args(self, frame, tokens, command):
-        func = command.func
+    def _gen_args(self, frame, tokens, func):
+        '''
+        Attempts to match tokens to function
+        parameters. Parameters with no annotation
+        should only be used as the last one as they are
+        passed any remaining tokens as a list.
+        '''
         signature = inspect.signature(func)
         args = []
 
-        for param in signature.parameters:
-            param = signature.parameters[param]
-            annotation = param.annotation
+        try:
+            for param in signature.parameters:
+                param = signature.parameters[param]
+                annotation = param.annotation
 
-            if annotation is int:
-                args.append(int(tokens.next()))
-            elif annotation is bool:
-                args.append(transform_bool(tokens.next()))
-            elif annotation is Member:
-                user_id = get_id(tokens.next())
-                args.append(frame.server.get_member(user_id))
-            elif annotation is Timespan:
-                args.append(transform_timespan(tokens.next()))
-            elif annotation is Frame:
-                args.append(frame)
-            elif annotation is str:
-                args.append(tokens.next())
-            else:
-                args.append(tokens.swallow())
+                if annotation is int:
+                    args.append(int(tokens.next()))
+                elif annotation is bool:
+                    args.append(transform_bool(tokens.next()))
+                elif annotation is Member:
+                    user_id = get_id(tokens.next())
+                    args.append(frame.server.get_member(user_id))
+                elif annotation is Timespan:
+                    args.append(transform_timespan(tokens.next()))
+                elif annotation is Frame:
+                    args.append(frame)
+                elif annotation is str:
+                    args.append(tokens.next())
+                else:
+                    args.append(tokens.swallow())
+        except:
+            # Typically we will want to swallow
+            # _gen_arg errors because it means an invalid
+            # command was issued.
+            if self.__DEBUG__: traceback.print_exc()
+            raise ShuckleArgumentError()
 
         return args
 
@@ -201,31 +213,25 @@ class Toolbox(object):
                 # commands. In this case the group
                 # is the command.
                 if cmd is None:
-                    command = self.core[cmd]
+                    func = self.core[group]
                 elif group in self.commands:
                     command = self.commands[group][cmd]
 
                     if frame.parent == command:
                         raise ShuckleError('Recursive commands are not allowed.')
-
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
                     if command.owner and frame.author.id != config.owner_id:
                         raise ShuckleUserPermissionError()
+
+                    func = command.func
                 else:
                     return
 
-                args = []
+                args = self._gen_args(frame, tokens, command)
 
                 try:
-                    args = self._gen_args(frame, tokens, command)
-                except:
-                    # Typically we will want to swallow
-                    # _gen_arg errors because it means and Invalid
-                    # command was issued.
-                    if self.__DEBUG__: traceback.print_exc()
-                try:
-                    await command.func(*args)
+                    await func(*args)
                 except errors.Forbidden:
                     raise ShucklePermissionError()
             except IndexError:
