@@ -8,9 +8,10 @@ class Command(object):
     '''
     A class used to represent a Shuckle command.
     '''
-    def __init__(self, cmd, perm=[]):
+    def __init__(self, cmd, owner, perm=[]):
         self.cmd = cmd
         self.user_perm = perm
+        self.owner = owner
         self.func = None
 
     def __repr__(self):

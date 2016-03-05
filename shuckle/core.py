@@ -205,6 +205,8 @@ class Toolbox(object):
 
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
+                    if command.owner and frame.author.id != config.owner_id:
+                        raise ShuckleUserPermissionError()
 
                     args = []
 
