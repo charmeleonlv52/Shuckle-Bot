@@ -13,32 +13,40 @@ def is_enabled(module, channel):
         except:
             return True
 
-def enable(module, channel):
-    with session_factory() as sess:
-        query = sess.query(ModuleStatus).filter(
-            ModuleStatus.channel==channel,
-            ModuleStatus.module==module
-        )
+def enable_module(module, channel):
+    try:
+        with session_factory() as sess:
+            query = sess.query(ModuleStatus).filter(
+                ModuleStatus.channel==channel,
+                ModuleStatus.module==module
+            )
 
-        if query.exists():
-            status = query.one()
-        else:
-            status = ModuleStatus(channel=channel, module=module)
+            if query.exists():
+                status = query.one()
+            else:
+                status = ModuleStatus(channel=channel, module=module)
 
-        status.status = True
-        status.save()
+            status.status = True
+            status.save()
+            return True
+    except:
+        return False
 
-def disable(module, channel):
-    with session_factory() as sess:
-        query = sess.query(ModuleStatus).filter(
-            ModuleStatus.channel==channel,
-            ModuleStatus.module==module
-        )
+def disable_module(module, channel):
+    try:
+        with session_factory() as sess:
+            query = sess.query(ModuleStatus).filter(
+                ModuleStatus.channel==channel,
+                ModuleStatus.module==module
+            )
 
-        if query.exists():
-            status = query.one()
-        else:
-            status = ModuleStatus(channel=channel, module=module)
+            if query.exists():
+                status = query.one()
+            else:
+                status = ModuleStatus(channel=channel, module=module)
 
-        status.status = False
-        status.save()
+            status.status = False
+            status.save()
+            return True
+    except:
+        return False
