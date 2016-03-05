@@ -10,7 +10,7 @@ from shuckle.command import command
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
-from shuckle import schedule
+from shuckle.schedule import add_task, delete_task, get_task, list_tasks
 from shuckle.types import Timespan
 from shuckle.util import gen_help, flatten
 
@@ -63,7 +63,7 @@ class ScheduleBot(object):
         @{bot_name} schedule list
         ```
         '''
-        task_list = [x.task for x in schedule.list(frame.channel.id)]
+        task_list = [x.task for x in list_tasks(frame.channel.id)]
         task_list = map(lambda x: '{}: {}'.format(x.name, x.invoke_command), task_list)
         task_list = '\n'.join(task_list)
 
@@ -77,7 +77,7 @@ class ScheduleBot(object):
         @{bot_name} schedule delete <task name>
         ```
         '''
-        if not schedule.delete(frame.channel.id, task):
+        if not delete_task(frame.channel.id, task):
             raise ShuckleError('This task does not exist.')
 
         await self.client.say('The task "{}" has been unscheduled.'.format(task))
@@ -100,7 +100,7 @@ class ScheduleBot(object):
         if frame.message.startswith('schedule add'):
             raise ShuckleError('You may not schedule a recursive command.')
 
-        if self.tasks.get_task(frame.server, frame.channel, name):
+        if schedule.get_task(frame.channel.id, name):
             raise ShuckleError('This task already exists.')
 
         async def do_task():
@@ -116,7 +116,7 @@ class ScheduleBot(object):
         asyncio.ensure_future(do_task())
 
         try:
-            schedule.add(task)
+            add_task(task)
         except:
             raise ShuckleError('Unable to schedule task.')
 
