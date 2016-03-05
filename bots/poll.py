@@ -1,12 +1,17 @@
 import asyncio
-from shuckle.command import command
-import humanfriendly
+from humanfriendly import format_timespan
 import json
 import os
 import pygal
 from pygal.style import Style
 import time
 import traceback
+
+from shuckle.command import command
+from shuckle.error import ShuckleError
+from shuckle.frame import Frame
+from shuckle.types import Timespan
+from shuckle.util import gen_help
 
 DiscordStyle = Style(
     background='#ffffff',
@@ -17,31 +22,6 @@ DiscordStyle = Style(
     foreground_subtle='#546e7a',
     colors=('#738bd7', '#1abc9c', '#3498db', '#e91e63', '#f1c40f')
 )
-
-HELP = """
-__Poll Commands:__
-
-Create a new poll in the current channel [B:AF]:
-```
-@{bot_name} poll make {{
-    "title": <string>,
-    "duration": <integer|seconds>,
-    "options": [<string>]
-}}
-```
-Shorthand for the above (does not support colons in options) [B:AF]:
-```
-@{bot_name} poll make <title>:<duration>:<option>[:<option>]
-```
-Cast your vote for the current poll:
-```
-@{bot_name} poll vote <integer>
-```
-Delete the current poll and don't show the results [U:MM]:
-```
-@{bot_name} poll delete
-```
-"""
 
 def make_chart(title, values):
     chart = pygal.Pie(
@@ -68,6 +48,9 @@ class Poll(object):
         self.closed = False
 
     def vote(self, option, uid):
+        if option <= 0 or option > len(self.options):
+            return
+
         self.votes[uid] = option
 
     def get_results(self):
@@ -90,6 +73,10 @@ class Poll(object):
         return sorted(results, key=lambda x: x[1], reverse=True)
 
 class PollBot(object):
+    '''
+    **Poll Bot**
+    Provides commands for poll creation.
+    '''
     __group__ = 'poll'
     polls = {}
 
@@ -97,52 +84,60 @@ class PollBot(object):
         self.client = client
 
     @command()
-    async def help(self, message):
-        await self.client.say(HELP.strip().format(bot_name=self.client.user.name))
+    async def help(self):
+        '''
+        Shows poll commands:
+        ```
+        @{bot_name} poll help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def make(self, message):
+    async def start(self, frame: Frame, title : str, duration : Timespan, options):
+        '''
+        Create a new poll in the current channel (does not support user mentions) [B:AF]:
+        ```
+        @{bot_name} poll start {{
+            "title": <string>,
+            "duration": <integer|seconds>,
+            "options": [<string>] // Note: This is an array of strings not an indicator for optional.
+        }}
+        ```
+        Shorthand for the above [B:AF]:
+        ```
+        @{bot_name} poll make <title> <duration> <option> [<option>]
+        ```
+        '''
         # Only one poll per channel
-        if message.channel in self.polls:
-            return
+        if frame.channel in self.polls:
+            raise ShuckleError('This channel already has a poll in progress.')
         try:
-            data = message.args
-
             try:
-                data = json.loads(data)
+                data = json.loads(title)
+                title = data['title']
+                duration = data['duration']
+                options = data['options']
             except:
                 # Shorthand
-                try:
-                    data = data.split(':')
-                    duration = int(humanfriendly.parse_timespan(data[1]))
+                duration = duration.duration
 
-                    if self.client.__DEBUG__ and duration > 5 * 60:
-                        return
-
-                    data = {
-                        'title': data[0],
-                        'duration': duration,
-                        'options': data[2:]
-                    }
-                except:
+                if self.client.__DEBUG__ and duration > 5 * 60:
                     return
 
-            poll = Poll(data['title'], data['options'])
-            self.polls[message.channel] = poll
+            poll = Poll(title, options)
+            self.polls[frame.channel] = poll
 
             # Create poll message and send it
-            poll_msg = '**POLL: {}** - Ends in {}'.format(
-                data['title'],
-                humanfriendly.format_timespan(data['duration'])
-            )
+            poll_msg = '**POLL: {}** - Ends in {}'.format(title, format_timespan(duration))
 
-            for x in range(len(data['options'])):
-                poll_msg += '\n{}. {}'.format(x + 1, data['options'][x])
+            for x in range(len(options)):
+                poll_msg += '\n{}. {}'.format(x + 1, options[x])
 
             await self.client.say(poll_msg)
 
             # Sleep for some time
-            await asyncio.sleep(data['duration'])
+            await asyncio.sleep(duration)
 
             if poll.closed:
                 return
@@ -151,7 +146,7 @@ class PollBot(object):
             top = poll.get_top()
 
             if top is not None:
-                chart = make_chart(data['title'], top)
+                chart = make_chart(title, top)
 
                 # Upload chart.
                 with open(chart, 'rb') as f:
@@ -164,38 +159,36 @@ class PollBot(object):
             else:
                 await self.client.say('**POLL: {}** - No Results'.format(data['title']))
 
-            '''
-            poll_msg = '**POLL: {}** - Results'.format(data['title'])
-
-            for x in range(len(top)):
-                poll_msg += '\n{}. {} ({})'.format(x + 1, top[x][0], top[x][1])
-
-            await self.client.say(poll_msg)
-            '''
-
             # Delete current poll to allow a new one
-            del self.polls[message.channel]
+            del self.polls[frame.channel]
         except:
             traceback.print_exc()
 
     @command()
-    async def vote(self, message):
+    async def vote(self, frame : Frame, option : int):
+        '''
+        Cast your vote for the current poll:
+        ```
+        @{bot_name} poll vote <integer>
+        ```
+        '''
         # Check to see if there's even a poll to vote on
-        if not message.channel in self.polls:
+        if not frame.channel in self.polls:
             return
-        try:
-            # Get vote option
-            option = int(message.args)
-            self.polls[message.channel].vote(option, message.author.id)
-        except:
-            traceback.print_exc()
+        self.polls[frame.channel].vote(option, frame.author.id)
 
     @command(perm=['manage_messages'])
-    async def delete(self, message):
+    async def stop(self, frame : Frame):
+        '''
+        Delete the current poll and don't show the results [U:MM]:
+        ```
+        @{bot_name} poll stop
+        ```
+        '''
         try:
-            self.polls[message.channel].closed = True
-            del self.polls[message.channel]
+            self.polls[frame.channel].closed = True
+            del self.polls[frame.channel]
         except:
-            pass
+            raise ShuckleError('This channel does not have a poll in progress.')
 
 bot = PollBot

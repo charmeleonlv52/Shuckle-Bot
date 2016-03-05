@@ -1,16 +1,11 @@
 import json
 import os
+
+from config import config
 from object import Object
 
 secrets = Object()
 
-path = '../secrets.json'
-
-with open(path) as f:
-    lines = ''.join(f.readlines())
-
-    s = json.loads(lines)
-
+with open(config.secrets_path) as f:
+    s = json.loads(f.read())
     secrets.update(s)
-
-del path

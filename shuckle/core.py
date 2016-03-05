@@ -1,33 +1,55 @@
-from config import DESCRIPTION
-from discord import Client, errors
-from error import ShuckleError, ShucklePermissionError, ShuckleUserPermissionError
+import asyncio
+from discord import Client, errors, Member
 import humanfriendly
+import inspect
 import os
-from secrets import secrets
-from command import Frame
 import sys
 from time import time
 import traceback
-from util import get_internal
+
+from config import config
+from secrets import secrets
+
+from .error import *
+from .frame import Frame
+from .tokenizer import Tokenizer
+from .transform import transform_bool, transform_timespan
+from .types import Timespan
+from .util import get_id, get_internal
 
 class Toolbox(object):
-    def __init__(self, base, main, bots, prefix=None, debug=False):
+    def __init__(self, base, main, data, bots, prefix=None, debug=False):
         self.start_time = time()
 
         self.__DEBUG__ = debug
         self.__BASE__ = base
         self.__MAIN__ = main
+        self.__DATA__ = data
         self.__BOTS__ = bots
         self.__PREFIX__ = prefix
 
         self.commands = {}
+        self.setup = []
+        self.teardown = []
         self.client = Client()
         self.user = None
+        self.core = {
+            'help': self.help,
+            'info': self.help,
+            'about': self.help
+        }
 
-        setattr(self.client, 'on_ready', self.on_ready)
-        setattr(self.client, 'on_message', self.on_message)
+        self.client.on_ready = self.on_ready
+        self.client.on_message = self.on_message
+
+        self.delete = self.client.delete_message
+        self.attach = self.client.send_file
 
     def _try_load(self, bot):
+        '''
+        Attempt to load a single bot given
+        an instance of it.
+        '''
         if not hasattr(bot, '__group__'):
             return
         if hasattr(bot, '__disabled__') and bot.__disabled__:
@@ -54,12 +76,21 @@ class Toolbox(object):
 
                 # Check for namespace collisions
                 if cmd in self.commands[x]:
-                    raise ShuckleError('Error: Found duplicate definition for <{}.{}>'.format(x, cmd))
+                    raise ShuckleError('Found duplicate definition for <{}.{}>'.format(x, cmd))
 
                 command.func = method
                 self.commands[x][cmd] = command
 
+        # If the bot has a setup add it to setup list
+        if hasattr(bot, 'setup') and hasattr(bot.setup, '__call__'):
+            self.setup.append(bot)
+        if hasattr(bot, 'teardown') and hasattr(bot.teardown, '__call__'):
+            self.teardown.append(bot)
+
     def _load_bots(self):
+        '''
+        Attempt to load all bots in the bots folder.
+        '''
         bots = os.listdir(self.__BOTS__)
 
         for bot in bots:
@@ -76,6 +107,15 @@ class Toolbox(object):
             # Try loading the bot
             self._try_load(bot)
 
+    def _unload_bots(self):
+        '''
+        Teardown and unload all bots.
+        '''
+        for bot in self.teardown:
+            bot.teardown()
+
+        self.commands = {}
+
     def run(self, email, password):
         try:
             self._load_bots()
@@ -91,44 +131,68 @@ class Toolbox(object):
 
         self.client.run(email, password)
 
-    @property
-    def channel(self):
-        return get_internal('_channel')
+    def remove_prefix(self, message):
+        '''
+        Attempts to remove the calling prefix from a message.
+        Returns True if it was removed (Shuckle was called).
+        Returns False if it was not (Shuckle was not called).
+        '''
+        mention = message.content.startswith(self.user.mention)
+        prefix = message.content.startswith(self.__PREFIX__)
 
-    @property
-    def uptime(self):
-        return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+        if mention or prefix:
+            if mention:
+                message.content = message.content.replace(self.user.mention, '', 1)
+            else:
+                message.content = message.content.replace(self.__PREFIX__, '', 1)
 
-    @property
-    def iden(self):
-        return get_internal('_iden')
+            return True
+        return False
 
-    async def say(self, message, *args, **kwargs):
-        await self.client.send_message(self.channel, message, *args, **kwargs)
+    def _gen_args(self, frame, tokens, func):
+        '''
+        Attempts to match tokens to function
+        parameters. Parameters with no annotation
+        should only be used as the last one as they are
+        passed any remaining tokens as a list.
+        '''
+        signature = inspect.signature(func)
+        args = []
 
-    async def tell(self, *args, **kwargs):
-        await self.client.send_message(get_internal('_author'), *args, **kwargs)
+        try:
+            for param in signature.parameters:
+                param = signature.parameters[param]
+                annotation = param.annotation
 
-    async def upload(self, f, *args, **kwargs):
-        await self.client.send_file(self.channel, f, *args, **kwargs)
+                if annotation is int:
+                    args.append(int(tokens.next()))
+                elif annotation is bool:
+                    args.append(transform_bool(tokens.next()))
+                elif annotation is Member:
+                    user_id = get_id(tokens.next())
+                    args.append(frame.server.get_member(user_id))
+                elif annotation is Timespan:
+                    args.append(transform_timespan(tokens.next()))
+                elif annotation is Frame:
+                    args.append(frame)
+                elif annotation is str:
+                    args.append(tokens.next())
+                else:
+                    args.append(tokens.swallow())
+        except:
+            # Typically we will want to swallow
+            # _gen_arg errors because it means an invalid
+            # command was issued.
+            if self.__DEBUG__: traceback.print_exc()
+            raise ShuckleArgumentError()
 
-    async def delete(self, *args, **kwargs):
-        await self.client.delete_message(*args, **kwargs)
-
-    async def edit(self, *args, **kwargs):
-        await self.client.edit_message(*args, **kwargs)
-
-    async def attach(self, *args, **kwargs):
-        await self.client.send_file(*args, **kwargs)
-
-    def get_history(self, **kwargs):
-        return self.client.logs_from(self.channel, **kwargs)
-
-    def has_perm(self, user, perm_list):
-        perm = self.channel.permissions_for(user)
-        return all(getattr(perm, x, False) for x in perm_list)
+        return args
 
     async def exec_command(self, frame):
+        '''
+        Attempt to execute a command given
+        its invocation frame.
+        '''
         # Internal variables are set here because
         # asyncio loops run separate to our stack.
         #
@@ -137,48 +201,50 @@ class Toolbox(object):
         # in on_message.
         _channel = frame.channel
         _author = frame.author
-        _iden = self.user if not frame.iden == self.__PREFIX__ else self.__PREFIX__
+
+        tokens = Tokenizer(frame.message)
+        group = tokens.next()
+        cmd = tokens.next()
 
         try:
-            if frame.group in self.commands:
-                command = self.commands[frame.group][frame.cmd]
+            try:
+                # There is a limited number of commands
+                # belonging to no group. All of them are core
+                # commands. In this case the group
+                # is the command.
+                if cmd is None:
+                    func = self.core[group]
+                elif group in self.commands:
+                    command = self.commands[group][cmd]
 
-                if not self.has_perm(frame.author, command.user_perm):
-                    raise ShuckleUserPermissionError()
+                    if frame.parent == command:
+                        raise ShuckleError('Recursive commands are not allowed.')
+                    if not self.has_perm(frame.author, command.user_perm):
+                        raise ShuckleUserPermissionError()
+                    if command.owner and frame.author.id != config.owner_id:
+                        raise ShuckleUserPermissionError()
+
+                    func = command.func
+                else:
+                    return
+
+                args = self._gen_args(frame, tokens, func)
+
                 try:
-                    await command.run(frame)
+                    await func(*args)
                 except errors.Forbidden:
                     raise ShucklePermissionError()
-                except Exception as e:
-                    raise e
-        except IndexError:
-            pass
-        except KeyError:
-            pass
-        except ShuckleError as e:
-            if self.__DEBUG__: traceback.print_exc()
-            await self.say(e)
-        except:
-            traceback.print_exc()
-
-    # Display Shuckle help information.
-    async def help(self, message):
-        if message.cmd is not None:
-            return
-
-        if any(message.group == x for x in ['help', 'about', 'info']):
-            # self.say not used because _channel
-            # is set in exec_command. help by itself
-            # is not invoked through exec_command.
-            await self.client.send_message(
-                message.channel,
-                DESCRIPTION.format(
-                    bot_name=self.user.name,
-                    uptime=self.uptime,
-                    bot_list=', '.join(sorted(self.commands.keys())),
-                    prefix=self.__PREFIX__
-                )
-            )
+            except IndexError:
+                pass
+            except KeyError:
+                pass
+            except ShuckleError as e:
+                if self.__DEBUG__: traceback.print_exc()
+                await self.say(e)
+            except:
+                traceback.print_exc()
+        except errors.Forbidden:
+            print('Error: No write permission for {}.{}'.format(frame.server, frame.channel))
 
     # Ready event handler
     async def on_ready(self):
@@ -189,18 +255,59 @@ class Toolbox(object):
             self.server_count += 1
 
         print('Shuckle is online...')
+        print('Running bot setup functions...')
+
+        for bot in self.setup:
+            await bot.setup()
+
+        print('Shuckle is ready...')
 
     # on_message event handler
     async def on_message(self, message):
         if message.author == self.user:
             return
 
-        mention_text = '@{} '.format(self.user.name)
-        mention = message.clean_content.startswith(mention_text)
+        if self.remove_prefix(message):
+            await self.exec_command(Frame(message))
 
-        if mention or message.content.startswith(self.__PREFIX__):
-            iden = self.user if mention else self.__PREFIX__
-            frame = Frame(message, iden)
+    ##################################
+    # WRAPPER FUNCTIONS
+    ##################################
 
-            await self.help(frame)
-            await self.exec_command(frame)
+    async def say(self, message, *args, **kwargs):
+        await self.client.send_message(get_internal('_channel'), message, *args, **kwargs)
+
+    async def tell(self, *args, **kwargs):
+        await self.client.send_message(get_internal('_author'), *args, **kwargs)
+
+    async def upload(self, f, *args, **kwargs):
+        await self.client.send_file(get_internal('_channel'), f, *args, **kwargs)
+
+    def get_history(self, **kwargs):
+        return self.client.logs_from(get_internal('_channel'), **kwargs)
+
+    @property
+    def uptime(self):
+        return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
+
+    def has_perm(self, user, perm_list):
+        perm = get_internal('_channel').permissions_for(user)
+        return all(getattr(perm, x, False) for x in perm_list)
+
+    ##################################
+    # CORE COMMANDS
+    ##################################
+
+    async def help(self):
+        '''
+        Display general information about Shuckle:
+        @{bot_name} help|about|info
+        '''
+        await self.say(
+            config.description.format(
+                bot_name=self.user.name,
+                uptime=self.uptime,
+                bot_list=', '.join(sorted(self.commands.keys())),
+                prefix=self.__PREFIX__
+            )
+        )

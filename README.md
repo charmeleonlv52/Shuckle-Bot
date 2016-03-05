@@ -1,5 +1,6 @@
 Shuckle Bot
 ===
+**WARNING: This is a pre-alpha build.**
 
 Author: Reticence
 

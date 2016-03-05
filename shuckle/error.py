@@ -3,7 +3,7 @@ class ShuckleError(Exception):
         self.message = message
 
     def __str__(self):
-        return self.message
+        return 'Error: ' + self.message
 
 class ShucklePermissionError(ShuckleError):
     def __init__(self):
@@ -12,3 +12,7 @@ class ShucklePermissionError(ShuckleError):
 class ShuckleUserPermissionError(ShuckleError):
     def __init__(self):
         super().__init__('You don\'t have permission to use this command.')
+
+class ShuckleArgumentError(ShuckleError):
+    def __init__(self):
+        super().__init__('Invalid argument used.')
