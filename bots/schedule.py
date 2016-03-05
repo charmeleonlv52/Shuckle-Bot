@@ -107,7 +107,7 @@ class ScheduleBot(object):
 
         task = Task(name, frame.message, original_frame)
 
-        if not add_task(task):
+        if self.loaded and not add_task(task):
             raise ShuckleError('Unable to schedule task.')
 
         if self.loaded:
