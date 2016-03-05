@@ -36,6 +36,6 @@ class ShuckleBot(object):
         ```
         '''
         await self.client.say('Restarting Shuckle...')
-        os.execv(os.path.join(self.client.__MAIN__), sys.argv)
+        os.execv(os.path.join(config.__MAIN__), sys.argv)
 
 bot = ShuckleBot

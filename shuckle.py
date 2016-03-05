@@ -16,11 +16,9 @@ else:
 
 config.__BASE__ = os.path.abspath(os.path.dirname(__file__))
 config.__MAIN__ = os.path.abspath(__file__)
-config.__DATA__ = os.path.join(__BASE__, 'data')
-config.__SHUCKLE__ = os.path.join(__BASE__, 'shuckle')
-config.__BOTS__ = os.path.join(__BASE__, config.bots_folder)
-
-sys.path.append(__SHUCKLE__)
+config.__DATA__ = os.path.join(config.__BASE__, 'data')
+config.__SHUCKLE__ = os.path.join(config.__BASE__, 'shuckle')
+config.__BOTS__ = os.path.join(config.__BASE__, config.bots_folder)
 
 from shuckle.core import Toolbox
 
