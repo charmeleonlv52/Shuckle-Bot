@@ -32,4 +32,4 @@ def read_file(path):
     Returns the contents of a given file.
     '''
     with open(path, 'r') as f:
-        return r.read()
+        return f.read()

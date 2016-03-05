@@ -139,13 +139,13 @@ class Toolbox(object):
         Returns False if it was not (Shuckle was not called).
         '''
         mention = message.content.startswith(self.user.mention)
-        prefix = message.content.startswith(config.__PREFIX__)
+        prefix = message.content.startswith(config.prefix)
 
         if mention or prefix:
             if mention:
                 message.content = message.content.replace(self.user.mention, '', 1)
             else:
-                message.content = message.content.replace(config.__PREFIX__, '', 1)
+                message.content = message.content.replace(config.prefix, '', 1)
 
             return True
         return False
@@ -332,6 +332,6 @@ class Toolbox(object):
                 bot_name=self.user.name,
                 uptime=self.uptime,
                 bot_list=', '.join(sorted(self.commands.keys())),
-                prefix=self.__PREFIX__
+                prefix=config.prefix
             )
         )
