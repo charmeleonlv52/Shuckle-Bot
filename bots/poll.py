@@ -120,8 +120,6 @@ class PollBot(object):
                 options = data['options']
             except:
                 # Shorthand
-                duration = duration.duration
-
                 if self.client.__DEBUG__ and duration > 5 * 60:
                     return
 
