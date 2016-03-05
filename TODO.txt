@@ -1,5 +1,1 @@
-- teardown functions for reload
 - clean up command parsing
-
-- move all core commands to a dict and use gen_args to generate
-  arguments for them
