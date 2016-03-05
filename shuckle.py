@@ -20,13 +20,13 @@ config.__DATA__ = os.path.join(config.__BASE__, 'data')
 config.__SHUCKLE__ = os.path.join(config.__BASE__, 'shuckle')
 config.__BOTS__ = os.path.join(config.__BASE__, config.bots_folder)
 
-from shuckle.core import Toolbox
-
-client = Toolbox(config, debug=__DEBUG__)
-
 if __name__ == '__main__':
     print('Starting up...')
     print('Debug status: {}'.format(__DEBUG__))
     print('Using user: ' + secrets.email)
+
+    from shuckle.core import Toolbox
+
+    client = Toolbox(config, __DEBUG__)
 
     client.run(secrets.email, secrets.password)
