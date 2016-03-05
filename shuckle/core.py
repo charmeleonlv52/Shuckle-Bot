@@ -29,7 +29,6 @@ class Toolbox(object):
         self.teardown = []
         self.client = Client()
         self.user = None
-        self.status = None
 
         self.core = {
             'help': self.help,
@@ -124,9 +123,6 @@ class Toolbox(object):
         print('Bots done loading...')
 
         if self.__DEBUG__: print(self.commands)
-
-        self.status = Status(self.commands.keys())
-        self.status.load()
 
         print('Shuckle is starting...')
 
