@@ -31,5 +31,5 @@ def read_file(path):
     '''
     Returns the contents of a given file.
     '''
-    with FileLock(path, mode='r') as f:
+    with open(path, 'r') as f:
         return f.read()

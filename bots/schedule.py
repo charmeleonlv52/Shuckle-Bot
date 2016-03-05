@@ -1,79 +1,25 @@
 import asyncio
-from config import config
 import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
 import os
-import pickle
+
+from config import config
 
 from shuckle.command import command
 from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
+from shuckle.schedule import load_schedule, add_task, delete_task, get_task, list_tasks
 from shuckle.types import Timespan
 from shuckle.util import gen_help, flatten
 
 class Task(object):
-    def __init__(self, name, task, frame):
-        self.server = frame.server
+    def __init__(self, name, command, frame):
         self.channel = frame.channel
         self.name = name
+        self.invoke_command = command
         self.frame = frame
-        self.task = task
-
-class TaskTable(object):
-    def __init__(self, tasks={}):
-        self.tasks = tasks
-
-    def add_task(self, task):
-        server = task.server.id
-        channel = task.channel.id
-        name = task.name
-
-        if server not in self.tasks:
-            self.tasks[server] = {}
-
-        if channel not in self.tasks[server]:
-            self.tasks[server][channel] = {}
-
-        if name in self.tasks[server][channel]:
-            raise ShuckleError('This task already exists.')
-
-        self.tasks[server][channel][name] = task
-
-    def delete_task(self, server, channel, name):
-        if hasattr(server, 'id'):
-            server = server.id
-        if hasattr(channel, 'id'):
-            channel = channel.id
-
-        try:
-            del self.tasks[server][channel][name]
-        except KeyError:
-            return False
-        return True
-
-    def get_task(self, server, channel, name):
-        if hasattr(server, 'id'):
-            server = server.id
-        if hasattr(channel, 'id'):
-            channel = channel.id
-
-        try:
-            return self.tasks[server][channel][name]
-        except KeyError:
-            return None
-
-    def list_tasks(self, server, channel):
-        if hasattr(server, 'id'):
-            server = server.id
-        if hasattr(channel, 'id'):
-            channel = channel.id
-
-        try:
-            return self.tasks[server][channel].items()
-        except KeyError:
-            return []
 
 class ScheduleBot(object):
     '''
@@ -84,33 +30,16 @@ class ScheduleBot(object):
 
     def __init__(self, client):
         self.client = client
-        # Suppress all bot messages
-        # while loading task schedule.
-        self.announce = True
-        self.tasks = TaskTable()
+        self.loaded = False
 
     async def setup(self):
-        self.announce = False
-        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
-
-        if not os.path.isfile(table_path):
-            return
-
-        with open(table_path, 'rb') as f:
-            try:
-                ghost_table = pickle.load(f)
-            except:
-                return
+        ghost_table = load_schedule()
 
         if ghost_table:
             for task in ghost_table:
-                await self.client.exec_command(task)
+                await self.client.exec_command(task.frame)
 
-        self.announce = True
-
-    def teardown(self):
-        save_schedule()
-        self.tasks = TaskTable()
+        self.loaded = True
 
     @command()
     async def help(self):
@@ -130,9 +59,10 @@ class ScheduleBot(object):
         @{bot_name} schedule list
         ```
         '''
-        server, channel = frame.server.id, frame.channel.id
-        task_list = map(lambda x: '{}: {}'.format(x[0], x[1].task), self.tasks.list_tasks(server, channel))
+        task_list = [x.task for x in list_tasks(frame.channel.id)]
+        task_list = map(lambda x: '{}: {}'.format(x.name, x.invoke_command), task_list)
         task_list = '\n'.join(task_list)
+
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
     @command(perm=['manage_messages'])
@@ -143,10 +73,9 @@ class ScheduleBot(object):
         @{bot_name} schedule delete <task name>
         ```
         '''
-        if not self.tasks.delete_task(frame.server, frame.channel, task):
+        if not delete_task(frame.channel.id, task):
             raise ShuckleError('This task does not exist.')
 
-        self.save_schedule()
         await self.client.say('The task "{}" has been unscheduled.'.format(task))
 
     @command(perm=['manage_messages'])
@@ -157,7 +86,6 @@ class ScheduleBot(object):
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
         '''
-        original_command = frame.message
         original_frame = copy.deepcopy(frame)
 
         frame.message = ' '.join(command)
@@ -167,7 +95,7 @@ class ScheduleBot(object):
         if frame.message.startswith('schedule add'):
             raise ShuckleError('You may not schedule a recursive command.')
 
-        if self.tasks.get_task(frame.server, frame.channel, name):
+        if self.loaded and get_task(frame.channel.id, name):
             raise ShuckleError('This task already exists.')
 
         async def do_task():
@@ -177,12 +105,10 @@ class ScheduleBot(object):
             if self.tasks.get_task(frame.server, frame.channel, name):
                 asyncio.ensure_future(do_task())
 
-        loop = asyncio.get_event_loop()
-        task = Task(name, original_command, original_frame)
+        task = Task(name, frame.message, original_frame)
 
-        asyncio.ensure_future(do_task())
-        self.tasks.add_task(task)
-        self.save_schedule()
+        if not add_task(task):
+            raise ShuckleError('Unable to schedule task.')
 
         if self.announce:
             await self.client.say(
@@ -192,20 +118,10 @@ class ScheduleBot(object):
             )
 
         try:
+            loop = asyncio.get_event_loop()
+            asyncio.ensure_future(do_task())
             loop.run_forever()
         except:
             pass
-
-    def save_schedule(self):
-        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
-        flat_table = flatten(self.tasks.tasks)
-
-        pickle_data = []
-
-        for task in flat_table:
-            pickle_data.append(task.frame)
-
-        with FileLock(table_path, 'wb+') as f:
-            pickle.dump(pickle_data, f, pickle.HIGHEST_PROTOCOL)
 
 bot = ScheduleBot

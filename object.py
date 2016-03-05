@@ -24,7 +24,8 @@ class Object(dict):
                 self[key] = []
 
                 for x in val[key]:
-                    self[key].append(Object(x))
+                    if isinstance(x, dict) or isinstance(x, list):
+                        self[key].append(Object(x))
             else:
                 self[key] = val[key]
 
