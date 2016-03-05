@@ -38,6 +38,7 @@ from object import Object
 from textwrap import dedent
 
 for x in config:
-    config[x] = dedent(config[x]).strip()
+    if type(config[x]) is str:
+        config[x] = dedent(config[x]).strip()
 
 config = Object(config)
