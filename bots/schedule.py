@@ -110,7 +110,7 @@ class ScheduleBot(object):
         if not add_task(task):
             raise ShuckleError('Unable to schedule task.')
 
-        if self.announce:
+        if self.loaded:
             await self.client.say(
                 'The task "{}" has been scheduled to be run every {}.'.format(
                     name, format_timespan(delay)
