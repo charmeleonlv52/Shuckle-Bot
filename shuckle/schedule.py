@@ -16,23 +16,22 @@ def add_task(task):
 def get_task(channel, name):
     try:
         with session_factory() as sess:
-            try:
-                return sess.query(Task).filter(
-                    Task.channel==channel,
-                    Task.name==name
-                ).one()
+            return sess.query(Task).filter(
+                Task.channel==channel,
+                Task.name==name
+            ).one()
     except:
         return None
 
 def delete_task(channel, name):
     try:
         with session_factory() as sess:
-                query = sess.query(Task).filter(
-                    Task.channel==channel,
-                    Task.name==name
-                ).delete()
+            query = sess.query(Task).filter(
+                Task.channel==channel,
+                Task.name==name
+            ).delete()
 
-                return True
+            return True
     except:
         return False
 
