@@ -21,8 +21,8 @@ def get_task(channel, name):
                     Task.channel==channel,
                     Task.name==name
                 ).one()
-        except:
-            return None
+    except:
+        return None
 
 def delete_task(channel, name):
     try:
