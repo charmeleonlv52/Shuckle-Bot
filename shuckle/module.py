@@ -19,7 +19,7 @@ def enable_module(module, channel):
             status = sess.query(ModuleStatus).filter(
                 ModuleStatus.channel==channel,
                 ModuleStatus.module==module
-            )
+            ).first()
 
             if not status:
                 status = ModuleStatus(channel=channel, module=module)
