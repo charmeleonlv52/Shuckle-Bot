@@ -1,4 +1,7 @@
 import json
+import os
+
+from config import config
 
 from .data import read_file, write_file
 
@@ -9,20 +12,16 @@ class Status(object):
     '''
     def __init__(self, modules):
         self.tracked = {x: {} for x in modules}
-        self.path = None
 
-    def load(self, path):
-        self.path = path
-
+    def load(self):
         try:
+            path = os.path.join(config.__DATA__, 'module_status.shuckle')
             self.tracked = json.loads(read_file(path))
         except IOError:
             self.save_status()
 
     def save_status(self):
-        if self.path is None:
-            raise IOError('Status data file not set.')
-
+        path = os.path.join(config.__DATA__, 'module_status.shuckle')
         write_file(self.path, json.dumps(self.tracked))
 
     def is_enabled(self, module, channel):

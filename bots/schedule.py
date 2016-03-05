@@ -1,10 +1,11 @@
 import asyncio
-from config import config
 import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
 import os
 import pickle
+
+from config import config
 
 from shuckle.command import command
 from shuckle.data import FileLock
@@ -197,7 +198,7 @@ class ScheduleBot(object):
             pass
 
     def save_schedule(self):
-        table_path = os.path.join(self.client.__DATA__, 'task_table.shuckle')
+        table_path = os.path.join(config.__DATA__, 'task_table.shuckle')
         flat_table = flatten(self.tasks.tasks)
 
         pickle_data = []

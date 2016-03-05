@@ -19,15 +19,10 @@ from .types import Module, Timespan
 from .util import get_id, get_internal
 
 class Toolbox(object):
-    def __init__(self, base, main, data, bots, prefix=None, debug=False):
+    def __init__(self, debug=False):
         self.start_time = time()
 
         self.__DEBUG__ = debug
-        self.__BASE__ = base
-        self.__MAIN__ = main
-        self.__DATA__ = data
-        self.__BOTS__ = bots
-        self.__PREFIX__ = prefix
 
         self.commands = {}
         self.setup = []
@@ -94,7 +89,7 @@ class Toolbox(object):
         '''
         Attempt to load all bots in the bots folder.
         '''
-        bots = os.listdir(self.__BOTS__)
+        bots = os.listdir(config.__BOTS__)
 
         for bot in bots:
             # Only try importing files
@@ -144,13 +139,13 @@ class Toolbox(object):
         Returns False if it was not (Shuckle was not called).
         '''
         mention = message.content.startswith(self.user.mention)
-        prefix = message.content.startswith(self.__PREFIX__)
+        prefix = message.content.startswith(config.__PREFIX__)
 
         if mention or prefix:
             if mention:
                 message.content = message.content.replace(self.user.mention, '', 1)
             else:
-                message.content = message.content.replace(self.__PREFIX__, '', 1)
+                message.content = message.content.replace(config.__PREFIX__, '', 1)
 
             return True
         return False

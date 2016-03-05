@@ -14,24 +14,17 @@ elif '-d' in sys.argv:
 else:
     __DEBUG__ = False
 
-__BASE__ = os.path.abspath(os.path.dirname(__file__))
-__MAIN__ = os.path.abspath(__file__)
-__DATA__ = os.path.join(__BASE__, 'data')
-__SHUCKLE__ = os.path.join(__BASE__, 'shuckle')
-__BOTS__ = os.path.join(__BASE__, config.bots_folder)
+config.__BASE__ = os.path.abspath(os.path.dirname(__file__))
+config.__MAIN__ = os.path.abspath(__file__)
+config.__DATA__ = os.path.join(__BASE__, 'data')
+config.__SHUCKLE__ = os.path.join(__BASE__, 'shuckle')
+config.__BOTS__ = os.path.join(__BASE__, config.bots_folder)
 
 sys.path.append(__SHUCKLE__)
 
 from shuckle.core import Toolbox
 
-client = Toolbox(
-    base=__BASE__,
-    main=__MAIN__,
-    data=__DATA__,
-    bots=__BOTS__,
-    prefix=config.prefix,
-    debug=__DEBUG__
-)
+client = Toolbox(config, debug=__DEBUG__)
 
 if __name__ == '__main__':
     print('Starting up...')
