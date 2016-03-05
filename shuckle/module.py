@@ -16,14 +16,12 @@ def is_enabled(module, channel):
 def enable_module(module, channel):
     try:
         with session_factory() as sess:
-            query = sess.query(ModuleStatus).filter(
+            status = sess.query(ModuleStatus).filter(
                 ModuleStatus.channel==channel,
                 ModuleStatus.module==module
             )
 
-            if query.exists():
-                status = query.one()
-            else:
+            if not status:
                 status = ModuleStatus(channel=channel, module=module)
 
             status.status = True
@@ -35,14 +33,12 @@ def enable_module(module, channel):
 def disable_module(module, channel):
     try:
         with session_factory() as sess:
-            query = sess.query(ModuleStatus).filter(
+            status = sess.query(ModuleStatus).filter(
                 ModuleStatus.channel==channel,
                 ModuleStatus.module==module
-            )
+            ).first()
 
-            if query.exists():
-                status = query.one()
-            else:
+            if not status:
                 status = ModuleStatus(channel=channel, module=module)
 
             status.status = False
