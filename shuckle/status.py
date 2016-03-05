@@ -17,7 +17,7 @@ class Status(object):
         try:
             path = os.path.join(config.__DATA__, 'module_status.shuckle')
             self.tracked = json.loads(read_file(path))
-        except IOError:
+        except:
             self.save_status()
 
     def save_status(self):
