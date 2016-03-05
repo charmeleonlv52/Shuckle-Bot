@@ -1,4 +1,4 @@
-from sqlalchemy import Blob, Column, Integer, String
+from sqlalchemy import PickleType, Column, Integer, String
 
 from db import Model, session_factory
 
@@ -8,7 +8,7 @@ class Task(Model):
     id = Column(Integer, primary_key=True)
     channel = Column(Integer)
     name = Column(String)
-    task = Column(Blob)
+    task = Column(PickleType)
 
     def save(self):
         with session_factory() as sess:

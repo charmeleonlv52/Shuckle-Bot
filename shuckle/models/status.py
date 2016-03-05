@@ -8,7 +8,7 @@ class ModuleStatus(Model):
     id = Column(Integer, primary_key=True)
     channel = Column(Integer)
     module = Column(String)
-    status = Coumn(Integer)
+    status = Column(Integer)
 
     def save(self):
         with session_factory() as sess:

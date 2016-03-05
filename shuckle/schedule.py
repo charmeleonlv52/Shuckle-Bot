@@ -1,5 +1,3 @@
-import pickle
-
 from .db import session_factory
 from .models.task import Task
 
@@ -8,8 +6,7 @@ def load():
         return sess.query(Task.task).all()
 
 def add(task):
-    blob = pickle.dumps(task, pickle.HIGHEST_PROTOCOL)
-    task = Task(task.channel.id, task.name, blob)
+    task = Task(channel=task.channel.id, name=task.name, task=blob)
     task.save()
 
 def delete(channel, name):
@@ -26,5 +23,4 @@ def delete(channel, name):
 
 def list():
     with session_factory() as sess:
-        tasks = sess.query(Task).all()
-        ret = [pickle.loads(x.task) for x in tasks]
+        tasks = sess.query(Task.task).all()

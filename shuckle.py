@@ -22,6 +22,8 @@ config.__DATA__ = os.path.join(config.__BASE__, 'data')
 config.__SHUCKLE__ = os.path.join(config.__BASE__, 'shuckle')
 config.__BOTS__ = os.path.join(config.__BASE__, config.bots_folder)
 
+sys.path.append(config.__SHUCKLE__)
+
 if __name__ == '__main__':
     print('Starting up...')
     print('Debug status: {}'.format(__DEBUG__))
