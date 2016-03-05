@@ -7,13 +7,14 @@ config = {
         Library: discord.py async beta
         Uptime: {uptime}
 
-        Shuckle combines many small bots into one super bot!
+        {bot_name} combines many small bots into one super bot and can be called Using @{bot_name} or {prefix}.
 
         __Installed Modules:__
         {bot_list}
 
         Want module specific information? Use: `@{bot_name} <module> help`
         Want to see the permission glossery? Use: `@{bot_name} help|about|info permissions`
+        Want to use {bot_name} on your own server? PM {bot_name} an invite.
         """,
     'permissions':
         """

@@ -266,6 +266,15 @@ class Toolbox(object):
         if message.author == self.user:
             return
 
+        if message.is_private:
+            # Assume whatever was received is a server invite
+            # and attempt to join it.
+            try:
+                invite = self.client.get_invite(message.clean_content.strip())
+                self.client.accept_invite(invite)
+            except:
+                return
+
         if self.remove_prefix(message):
             await self.exec_command(Frame(message))
 
