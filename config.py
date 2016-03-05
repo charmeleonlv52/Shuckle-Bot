@@ -30,7 +30,9 @@ config = {
     'bots_folder': 'bots',
     'min_delay': 5,
     'owner_id': '126383697929699328',
-    'secrets_path': '../secrets.json'
+    'secrets_path': '../secrets.json',
+    # Frozen modules cannot be disabled through Module Bot.
+    'frozen_modules': ['help', 'info', 'about', 'module']
 }
 
 # DO NOT TOUCH ANYTHING BELOW
