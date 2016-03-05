@@ -266,7 +266,7 @@ class Toolbox(object):
         if message.author == self.user:
             return
 
-        if message.is_private:
+        if message.channel.is_private:
             # Assume whatever was received is a server invite
             # and attempt to join it.
             try:
