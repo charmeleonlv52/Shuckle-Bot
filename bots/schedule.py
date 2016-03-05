@@ -156,11 +156,12 @@ class ScheduleBot(object):
         original_frame = copy.deepcopy(frame)
 
         frame.message = ' '.join(command)
-        frame.parent = self.add
         delay = delay.duration
 
         if delay < config.min_delay:
             raise ShuckleError('You must choose a longer interval.')
+        if frame.message.startswith('schedule add'):
+            raise ShuckleError('You may not schedule a recursive command.')
 
         if self.tasks.get_task(frame.server, frame.channel, name):
             raise ShuckleError('This task already exists.')

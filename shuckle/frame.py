@@ -9,9 +9,8 @@ class Frame(object):
         channel: The channel of invocation
         author: The author of the message
     '''
-    def __init__(self, message, parent=None):
+    def __init__(self, message):
         self.server = message.server
         self.channel = message.channel
         self.author = message.author
         self.message = message.content
-        self.parent = parent

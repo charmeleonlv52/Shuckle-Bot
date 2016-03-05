@@ -218,8 +218,6 @@ class Toolbox(object):
                 elif group in self.commands:
                     command = self.commands[group][cmd]
 
-                    if frame.parent == command:
-                        raise ShuckleError('Recursive commands are not allowed.')
                     if not self.has_perm(frame.author, command.user_perm):
                         raise ShuckleUserPermissionError()
                     if command.owner and frame.author.id != config.owner_id:
