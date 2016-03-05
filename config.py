@@ -23,8 +23,9 @@ config = {
         B: - Bot permission
         U: - User permission
         AF - Attach files
-        MM - Manage messages
         H - View message history
+        MC - Manage channels
+        MM - Manage messages
         """,
     'prefix': '~',
     'bots_folder': 'bots',
