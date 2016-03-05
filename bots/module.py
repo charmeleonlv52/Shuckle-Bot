@@ -53,8 +53,8 @@ class ModuleBot(object):
         ```
         '''
         if is_enabled(frame.channel.id, module):
-            self.disable(frame, module)
+            await self.disable(frame, module)
         else:
-            self.enable(frame, module)
+            await self.enable(frame, module)
 
 bot = ModuleBot
