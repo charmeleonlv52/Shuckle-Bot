@@ -27,6 +27,7 @@ config = {
         """,
     'prefix': '~',
     'bots_folder': 'bots',
+    'min_delay': 5,
     'owner_id': '126383697929699328',
     'secrets_path': '../secrets.json'
 }

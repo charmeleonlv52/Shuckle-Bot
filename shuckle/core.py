@@ -33,6 +33,7 @@ class Toolbox(object):
         self.teardown = []
         self.client = Client()
         self.user = None
+
         self.core = {
             'help': self.help,
             'info': self.help,

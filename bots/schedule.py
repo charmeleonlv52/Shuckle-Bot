@@ -159,6 +159,9 @@ class ScheduleBot(object):
         frame.parent = self.add
         delay = delay.duration
 
+        if delay < config.min_delay:
+            raise ShuckleError('You must choose a longer interval.')
+
         if self.tasks.get_task(frame.server, frame.channel, name):
             raise ShuckleError('This task already exists.')
 
