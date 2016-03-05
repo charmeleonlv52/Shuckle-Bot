@@ -78,7 +78,7 @@ class TaskTable(object):
 class ScheduleBot(object):
     '''
     **Schedule Bot**
-    Provides commands to schedule periodic tasks to run.
+    Provides commands for scheduling tasks to run periodically.
     '''
     __group__ = 'schedule'
 
