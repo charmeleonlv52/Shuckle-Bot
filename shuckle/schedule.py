@@ -7,7 +7,7 @@ def load_schedule():
 
 def add_task(task):
     try:
-        task = Task(channel=task.channel.id, name=task.name, task=blob)
+        task = Task(channel=task.channel.id, name=task.name, task=task)
         task.save()
         return True
     except:
