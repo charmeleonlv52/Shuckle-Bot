@@ -277,7 +277,7 @@ class Toolbox(object):
             # Assume whatever was received is a server invite
             # and attempt to join it.
             try:
-                await invite = self.client.get_invite(message.clean_content.strip())
+                invite = await self.client.get_invite(message.clean_content.strip())
                 await self.client.accept_invite(invite)
             except:
                 return
