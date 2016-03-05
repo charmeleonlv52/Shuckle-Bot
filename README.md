@@ -15,4 +15,5 @@ Installation
 1. Edit config.py to your liking.
 2. `python3.5 -m pip install git+https://github.com/Rapptz/discord.py@async`
 3. `python3.5 -m pip install -r requirements.txt`
+4. `chmod +x shuckle.py`
 4. `chmod +x start.sh; ./start.sh` or `python3.5 shuckle.py`
