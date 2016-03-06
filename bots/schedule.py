@@ -99,13 +99,6 @@ class ScheduleBot(object):
         if self.loaded and get_task(frame.channel.id, name):
             raise ShuckleError('This task already exists.')
 
-        async def do_task():
-            await self.client.exec_command(frame)
-            await asyncio.sleep(delay)
-
-            if get_task(frame.channel.id, name):
-                asyncio.ensure_future(do_task())
-
         task = Task(name, original_message, original_frame)
 
         if self.loaded and not add_task(task):
@@ -119,9 +112,9 @@ class ScheduleBot(object):
             )
 
         try:
-            loop = asyncio.get_event_loop()
-            asyncio.ensure_future(do_task())
-            loop.run_forever()
+            while get_task(frame.channel.id, name):
+                await self.client.exec_command(frame)
+                await asyncio.sleep(delay)
         except:
             pass
 
