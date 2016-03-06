@@ -64,4 +64,8 @@ def get_id(s):
     Returns an ID extracted from mention text.
     '''
     match = re.search(r'<@(\d+?)>', s)
+    
+    if match is None:
+        return None
+
     return match.group(1)
