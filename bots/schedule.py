@@ -51,10 +51,10 @@ class ScheduleBot(object):
         '''
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
-    @command(perm=['manage_messages'])
+    @command(perm=['manage_messages', 'manage_channels'])
     async def list(self, frame: Frame):
         '''
-        Lists all scheduled tasks to run in the current chanenl [U:MM]:
+        Lists all scheduled tasks to run in the current chanenl [U:MC/U:MM]:
         ```
         @{bot_name} schedule list
         ```
@@ -65,10 +65,10 @@ class ScheduleBot(object):
 
         await self.client.say('Here is a list of scheduled tasks: \n{}'.format(task_list))
 
-    @command(perm=['manage_messages'])
+    @command(perm=['manage_messages', 'manage_channels'])
     async def delete(self, frame: Frame, task: str):
         '''
-        Removes a task from the scheduler [U:MM]:
+        Removes a task from the scheduler [U:MC/U:MM]:
         ```
         @{bot_name} schedule delete <task name>
         ```
@@ -78,10 +78,10 @@ class ScheduleBot(object):
 
         await self.client.say('The task "{}" has been unscheduled.'.format(task))
 
-    @command(perm=['manage_messages'])
+    @command(perm=['manage_messages', 'manage_channels'])
     async def add(self, frame: Frame, name: str, delay: Timespan, command):
         '''
-        Adds a task to run at a set interval [U:MM]:
+        Adds a task to run at a set interval [U:MC/U:MM]:
         ```
         @{bot_name} schedule add <task name> <interval> <command (no prefix)>
         ```
