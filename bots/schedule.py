@@ -87,6 +87,7 @@ class ScheduleBot(object):
         ```
         '''
         original_frame = copy.deepcopy(frame)
+        original_message = frame.message
 
         frame.message = ' '.join(command)
 
@@ -105,7 +106,7 @@ class ScheduleBot(object):
             if get_task(frame.channel.id, name):
                 asyncio.ensure_future(do_task())
 
-        task = Task(name, frame.message, original_frame)
+        task = Task(name, original_message, original_frame)
 
         if self.loaded and not add_task(task):
             raise ShuckleError('Unable to schedule task.')
