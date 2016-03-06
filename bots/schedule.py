@@ -96,15 +96,17 @@ class ScheduleBot(object):
         if frame.message.startswith('schedule add'):
             raise ShuckleError('You may not schedule a recursive command.')
 
-        if self.loaded and get_task(frame.channel.id, name):
-            raise ShuckleError('This task already exists.')
-
+        # self.loaded is False if we're currently running
+        # setup. In which case, we should not announce when
+        # a task has been scheduled.
         task = Task(name, original_message, original_frame)
 
-        if self.loaded and not add_task(task):
-            raise ShuckleError('Unable to schedule task.')
-
         if self.loaded:
+            if get_task(frame.channel.id, name):
+                raise ShuckleError('This task already exists.')
+            elif not add_task(task):
+                raise ShuckleError('Unable to schedule task.')
+
             await self.client.say(
                 'The task "{}" has been scheduled to be run every {}.'.format(
                     name, format_timespan(delay)
