@@ -9,6 +9,7 @@ from shuckle.util import gen_help
 
 class ModuleBot(object):
     '''
+    **Module Bot**
     Provides commands for enabling and disabling individual modules.
     '''
     __group__ = 'module'
