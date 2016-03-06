@@ -1,5 +1,2 @@
-__pycache__/*
-bots/__pycache__/*
-shuckle/__pycache__/*
-data/*.shuckle
-.pyc
+**/__pycache__
+**/*.pyc
