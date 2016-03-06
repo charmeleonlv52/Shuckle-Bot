@@ -5,6 +5,7 @@ from shuckle.error import ShuckleError
 from shuckle.frame import Frame
 from shuckle.module import enable_module, disable_module, is_enabled
 from shuckle.types import Module
+from shuckle.util import gen_help
 
 class ModuleBot(object):
     '''
