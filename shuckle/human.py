@@ -1,51 +1,56 @@
-from discord import User
-import humanfriendly
+from tokenizer import Tokenizer
 
-from util import get_id
+def is_and(s):
+    return s.lower() in ['and', '&', '&&']
 
-'''
-Attempts to turn a human readable condition
-string into a series of compound functions.
-'''
+def is_or(s):
+    return s.lower() in ['or', '|', '||']
 
-def get_compound(s):
-    and_compound = ['and', '&&', '&']
-    or_compound = ['or', '||', '|']
+def is_equal(s):
+    return s.lower() in ['is', '=', '==']
 
-    if s.lower() in and_compound:
-        return lambda x, y: x and y
-    elif s.lower() in or_compound:
-        return lambda x, y: x or y
+def is_contains(s):
+    return s.lower() in ['contains']
 
-    return None
+def is_in(s):
+    return s.lower() in ['in']
 
-def is_member(id):
-    def check_member(test):
-        if not isinstance(test, User):
-            return False
-        return test.id == id
-    return check_member
+def is_op(s):
+    op_list = [is_and, is_or, is_equal, is_contains, is_in]
+    return any(x(s) for x in op_list)
 
-def parse_helper(tokens, start, end):
-    condition = []
-    index = 0
+class Human(object):
+    def __init__(self, s):
+        self.tokens = Tokenizer(s)
+        self.parse()
+        self.build_tree()
 
-    while index < end:
-        token = tokens[x]
+    def parse(self):
+        tokens = self.tokens.tokens
+        stack = []
+        queue = []
 
-        # Is this a mention?
-        # Assume that if the first token in the list
-        # represents a member mention then we want the
-        # user check to be the ONLY condition.
-        if get_id(token):
-            if index == 0 and end > 1 and not get_compound(tokens[1]):
-                return is_member(token)
-            condition.append(is_member(token))
-        if get_compound(s):
-            left = tokens[:index]
-            right =
+        for token in tokens:
+            if is_and(token):
+                while len(stack) and not is_or(stack[-1]):
+                    queue.append(stack.pop())
+                stack.append(token)
+            elif is_or(token):
+                while len(stack) and not is_or(stack[-1]):
+                    queue.append(stack.pop())
+                stack.append(token)
+            elif is_equal(token) or is_contains(token) or is_in(token):
+                while len(stack) and not is_and(stack[-1]) and not is_or(stack[-1]):
+                    queue.append(stack.pop())
+                stack.append(token)
+            else:
+                queue.append(token)
 
-        index += 1
+        queue.extend(stack[::-1])
 
-def parse_condition(tokens):
-    return parse_helper(tokens, 0, len(tokens))
+        self.queue = queue
+
+
+if __name__ == '__main__':
+    test = Human('{author} is <@24234524342343423> or {message} contains "herp derp" and {attachment}')
+    print test.queue
