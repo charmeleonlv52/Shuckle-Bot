@@ -87,7 +87,7 @@ class HearthBot(object):
                     body = await resp.json()
                     body = body[0]
                     name = body['name']
-                    image = body['image']
+                    image = body['img']
                     now = time()
                     path = '/tmp/{}.png'.format(now)
 
