@@ -47,12 +47,12 @@ class HearthBot(object):
         headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(route, payload=payload, headers=headers) as resp:
+            async with session.get(route, data=payload, headers=headers) as resp:
                 if resp.status == 404:
                     raise ShuckleError('No results found.')
                 elif resp.status == 200:
                     body = await resp.json()
-                    cards = '\n'.join()[x['name'] for x in body])
+                    cards = '\n'.join([x['name'] for x in body])
                     await self.say(SEARCH_DISPLAY.strip().format(card, cards))
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
@@ -66,7 +66,7 @@ class HearthBot(object):
         headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(route, payload=payload, headers=headers) as resp:
+            async with session.get(route, data=payload, headers=headers) as resp:
                 # This isn't an actual card. Try searching
                 # for it and returning the result.
                 if resp.status == 404:
@@ -76,3 +76,5 @@ class HearthBot(object):
                     await self.say(CARD_DISPLAY.strip().format(*body))
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
+
+bot = HearthBot
