@@ -14,7 +14,6 @@ CARD_DISPLAY = '''
 **{name}**
 Set: {cardSet}
 Type: {type}
-Class: {faction}
 Rarity: {rarity}
 Stats: {attack}/{health}
 Flavor Text: {flavor}
