@@ -51,6 +51,12 @@ class HearthBot(object):
 
     @command()
     async def search(self, card):
+        '''
+        Lists cards that contain a search string (min length: 3):
+        ```
+        @{bot_name} hearth search <card>
+        ```
+        '''
         card = ' '.join(card)
 
         if len(card) < 3:
@@ -66,12 +72,18 @@ class HearthBot(object):
                 elif resp.status == 200:
                     body = await resp.json()
                     cards = '\n'.join([x['name'] for x in body])
-                    await self.say(SEARCH_DISPLAY.strip().format(card, cards))
+                    await self.client.say(SEARCH_DISPLAY.strip().format(card, cards))
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
 
     @command()
     async def card(self, card):
+        '''
+        Shows information about a specific card:
+        ```
+        @{bot_name} hearth card <card>
+        ```
+        '''
         card = ' '.join(card)
 
         route = SINGLE_CARD.format(card)
@@ -94,7 +106,7 @@ class HearthBot(object):
                     await download(image, path)
 
                     with open(path, 'rb') as f:
-                        await self.upload(f, content=CARD_DISPLAY.strip().format(**body))
+                        await self.client.upload(f, content=CARD_DISPLAY.strip().format(**body))
 
                     try:
                         os.remove(path)
