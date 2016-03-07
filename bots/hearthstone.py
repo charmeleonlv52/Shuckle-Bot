@@ -103,9 +103,7 @@ class HearthBot(object):
                     name = body['name']
                     image = body['img']
 
-                    with TempDownload(image) as path:
-                        await download(image, path)
-
+                    async with TempDownload(image) as path:
                         with open(path, 'rb') as f:
                             await self.client.upload(f, content=CARD_DISPLAY.strip().format(**body))
                 else:
