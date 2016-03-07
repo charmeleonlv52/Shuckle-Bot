@@ -1,10 +1,12 @@
 import aiohttp
 import json
+import time
 
 from config import config
 
 from shuckle.command import command
 from shuckle.error import ShuckleError
+from shuckle.data import FileLock
 
 CARD_DISPLAY = '''
 **{name}**
@@ -13,7 +15,7 @@ Type: {type}
 Class: {faction}
 Rarity: {rarity}
 Stats: {attack}/{health}
-Image: {img}
+Flavor Text: {flavor}
 '''
 
 SEARCH_DISPLAY = '''
@@ -23,6 +25,14 @@ Here is a list of cards that contain {}:
 
 SINGLE_CARD = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/{}'
 SEARCH_CARD = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/search/{}'
+
+async def download(url, path):
+    with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            dl = await resp.read()
+
+            with FileLock(path, 'wb') as f:
+                f.write(dl)
 
 class HearthBot(object):
     '''
@@ -74,7 +84,15 @@ class HearthBot(object):
                     await self.search(card)
                 elif resp.status == 200:
                     body = await resp.json()
-                    await self.say(CARD_DISPLAY.strip().format(*body))
+                    body = body[0]
+                    name = body['name']
+                    image = body['image']
+                    now = time()
+                    path = '/tmp/{}.png'.format(now)
+
+                    await download_file(image, path)
+
+                    await self.attach('/tmp/{}.png'.format(now), **body[0])
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
 
