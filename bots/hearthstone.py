@@ -61,14 +61,14 @@ class HearthBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
-    async def search(self, card):
+    async def search(self, args):
         '''
         Lists cards that contain a search string (min length: 3):
         ```
         @{bot_name} hearth search <card>
         ```
         '''
-        card = ' '.join(card)
+        card = ' '.join(args)
 
         if len(card) < 3:
             raise ShuckleError('Please provide a longer search string.')
@@ -88,14 +88,14 @@ class HearthBot(object):
                     raise ShuckleError('Unable to get card information. Try again later.')
 
     @command()
-    async def card(self, card):
+    async def card(self, args):
         '''
         Shows information about a specific card:
         ```
         @{bot_name} hearth card <card>
         ```
         '''
-        card = ' '.join(card)
+        card = ' '.join(args)
 
         route = SINGLE_CARD.format(card)
         headers = self.headers
@@ -105,7 +105,7 @@ class HearthBot(object):
                 # This isn't an actual card. Try searching
                 # for it and returning the result.
                 if resp.status == 404:
-                    await self.search(card)
+                    await self.search(args)
                 elif resp.status == 200:
                     body = await resp.json()
                     body = body[0]
