@@ -53,7 +53,7 @@ class TwitchBot(object):
             if not add_stream(stream):
                 raise ShuckleError('Unable to add stream to watch list.')
 
-            await self.client.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
+            await self.client.say('Okay. I will make a one-time announcement when **{}** starts streaming.'.format(streamer))
 
         route = TWITCH_STREAM.format(streamer)
 
@@ -64,7 +64,7 @@ class TwitchBot(object):
                         body = await resp.json()
 
                         if body['stream'] is not None:
-                            await self.client.say('{} is now streaming!'.format(stream))
+                            await self.client.say('**{}** is now streaming!'.format(streamer))
                             delete_stream(frame.channel.id, streamer)
                             break
 

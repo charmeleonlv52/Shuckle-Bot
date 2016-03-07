@@ -75,7 +75,7 @@ class ScheduleBot(object):
         if not delete_task(frame.channel.id, task):
             raise ShuckleError('This task does not exist.')
 
-        await self.client.say('The task "{}" has been unscheduled.'.format(task))
+        await self.client.say('The task **{}** has been unscheduled.'.format(task))
 
     @command(perm=['manage_messages', 'manage_channels'])
     async def add(self, frame: Frame, name: str, delay: Timespan, command):
@@ -107,7 +107,7 @@ class ScheduleBot(object):
                 raise ShuckleError('Unable to schedule task.')
 
             await self.client.say(
-                'Okay. I will run the task "{}" every {}.'.format(
+                'Okay. I will run the task **{}** every {}.'.format(
                     name, format_timespan(delay)
                 )
             )
