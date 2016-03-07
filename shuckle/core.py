@@ -10,9 +10,9 @@ import traceback
 from config import config
 from secrets import secrets
 
+from .db.module import is_enabled
 from .error import *
 from .frame import Frame
-from .module import is_enabled
 from .tokenizer import Tokenizer
 from .transform import transform_bool, transform_timespan
 from .types import Module, Timespan
