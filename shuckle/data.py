@@ -45,7 +45,7 @@ class TempDownload(object):
         self.url = url
         now = time.time()
         _, ext = os.path.splitext(url)
-        self.path = '/tmp/{}.{}'.format(self.now, ext)
+        self.path = '/tmp/{}.{}'.format(now, ext)
 
     async def __enter__(self):
         with aiohttp.ClientSession() as session:
