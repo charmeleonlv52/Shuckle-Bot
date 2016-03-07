@@ -1,5 +1,6 @@
 import aiohttp
 import json
+import os
 import time
 
 from config import config
@@ -91,8 +92,12 @@ class HearthBot(object):
                     path = '/tmp/{}.png'.format(now)
 
                     await download_file(image, path)
+                    await self.attach(path, **body)
 
-                    await self.attach('/tmp/{}.png'.format(now), **body[0])
+                    try:
+                        os.remove(path)
+                    except:
+                        pass
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
 
