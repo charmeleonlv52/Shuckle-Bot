@@ -54,7 +54,7 @@ class HearthBot(object):
         '''
         Show hearth commands:
         ```
-        @{bot_name} mod help
+        @{bot_name} hearth help
         ```
         '''
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
