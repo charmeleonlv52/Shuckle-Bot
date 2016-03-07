@@ -10,9 +10,6 @@ from shuckle.util import gen_help
 CARD_DISPLAY = '''
 **{name}**
 Set: {cardSet}
-Type: {type}
-Rarity: {rarity}
-Stats: {attack}/{health}
 Flavor Text: {flavor}
 '''
 
