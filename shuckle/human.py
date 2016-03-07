@@ -1,7 +1,7 @@
-# from discord import Member
+from discord import Member
 
 from tokenizer import Tokenizer
-# from util import get_id
+from util import get_id
 
 def is_and(s):
     return s.lower() in ['and', '&', '&&']
