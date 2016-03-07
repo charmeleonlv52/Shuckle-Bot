@@ -46,7 +46,7 @@ class TempDownload(object):
         _, ext = os.path.splitext(url)
         self.path = '/tmp/{}.{}'.format(self.now, ext)
 
-    def __enter__(self):
+    async def __enter__(self):
         with aiohttp.ClientSession() as session:
             async with session.get(self.url) as resp:
                 dl = await resp.read()
@@ -56,7 +56,7 @@ class TempDownload(object):
 
                 return self.path
 
-    def __exit__(self):
+    async def __exit__(self, *args):
         try:
             os.remove(self.path)
         except:
