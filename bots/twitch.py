@@ -1,4 +1,5 @@
 import aiohttp
+import asyncio
 
 from shuckle.command import command
 from shuckle.db.twitch import  add_stream, get_streams, get_stream
