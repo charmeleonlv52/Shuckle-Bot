@@ -8,7 +8,7 @@ class TwitchStream(Model):
     id = Column(Integer, primary_key=True)
     channel = Column(Integer)
     streamer = Column(String)
-    stream = Column(Pickle)
+    stream = Column(PickleType)
 
     def save(self):
         with session_factory() as sess:

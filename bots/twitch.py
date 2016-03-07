@@ -2,6 +2,7 @@ import aiohttp
 
 from shuckle.command import command
 from shuckle.db.twitch import  add_stream, get_streams, get_stream
+from shuckle.frame import Frame
 from shuckle.error import ShuckleError
 
 TWITCH_STREAM = 'https://api.twitch.tv/kraken/streams/{}'
@@ -62,6 +63,6 @@ class TwitchBot(object):
                         if body['stream'] is not None:
                             await self.client.say('{} is now streaming!'.format(stream))
 
-            await asyncio.sleep(CHECK_DELAY))
+            await asyncio.sleep(CHECK_DELAY)
 
 bot = TwitchBot
