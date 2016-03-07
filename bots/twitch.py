@@ -45,7 +45,7 @@ class TwitchBot(object):
             if get_stream(frame.channel.id, streamer):
                 raise ShuckleError('This streamer is already being watched.')
 
-            stream = Streamer(streamer, frame)
+            stream = Stream(streamer, frame)
 
             if not add_stream(stream):
                 raise ShuckleError('Unable to watch for stream.')
