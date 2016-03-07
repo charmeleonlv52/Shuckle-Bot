@@ -91,8 +91,10 @@ class HearthBot(object):
                     now = time.time()
                     path = '/tmp/{}.png'.format(now)
 
-                    await download_file(image, path)
-                    await self.attach(path, content=CARD_DISPLAY.format(**body))
+                    await download(image, path)
+
+                    with open(path, 'rb') as f:
+                        await self.attach(f, content=CARD_DISPLAY.strip().format(**body))
 
                     try:
                         os.remove(path)
