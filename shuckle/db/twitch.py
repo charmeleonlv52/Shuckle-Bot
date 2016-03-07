@@ -3,7 +3,7 @@ from .models.twitch import TwitchStream
 
 def get_streams():
     with session_factory() as sess:
-        return sess.query(TwitchStream.stream).all()
+        return [x.stream for x in sess.query(TwitchStream.stream).all()]
 
 def get_stream(channel, streamer):
     try:
