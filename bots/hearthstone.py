@@ -94,7 +94,7 @@ class HearthBot(object):
                     await download(image, path)
 
                     with open(path, 'rb') as f:
-                        await self.attach(f, content=CARD_DISPLAY.strip().format(**body))
+                        await self.upload(f, content=CARD_DISPLAY.strip().format(**body))
 
                     try:
                         os.remove(path)
