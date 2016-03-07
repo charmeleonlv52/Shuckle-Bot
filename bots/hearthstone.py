@@ -1,7 +1,3 @@
-curl --get --include 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/leeroy%20jenkins' \
-  -H 'X-Mashape-Key: uAN2N2GQYYmshZq6F4beo3U0KWVLp1b3ydQjsnHcjwFV6v0LZN' \
-  -H 'Accept: application/json'
-
 import aiohttp
 import json
 
