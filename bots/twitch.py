@@ -51,7 +51,7 @@ class TwitchBot(object):
             if not add_stream(stream):
                 raise ShuckleError('Unable to add stream to watch list.')
 
-            await self.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
+            await self.client.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
 
         route = TWITCH_STREAM.format(streamer)
 
