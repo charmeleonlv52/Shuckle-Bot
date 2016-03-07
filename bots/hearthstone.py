@@ -99,7 +99,7 @@ class HearthBot(object):
 
                     async with TempDownload(image) as path:
                         with open(path, 'rb') as f:
-                            await self.client.upload(f, content=CARD_DISPLAY.strip().format(**body))
+                            await self.client.upload(f)
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
 
