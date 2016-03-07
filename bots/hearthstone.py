@@ -4,6 +4,7 @@ import json
 from config import config
 
 from shuckle.command import command
+from shuckle.error import ShuckleError
 
 CARD_DISPLAY = '''
 **{name}**
