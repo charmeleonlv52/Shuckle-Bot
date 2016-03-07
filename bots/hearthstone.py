@@ -6,8 +6,9 @@ import time
 from config import config
 
 from shuckle.command import command
-from shuckle.error import ShuckleError
 from shuckle.data import FileLock
+from shuckle.error import ShuckleError
+from shuckle.util import gen_help
 
 CARD_DISPLAY = '''
 **{name}**
