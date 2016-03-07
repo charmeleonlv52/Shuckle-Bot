@@ -20,7 +20,7 @@ Flavor Text: {flavor}
 '''
 
 SEARCH_DISPLAY = '''
-Here is a list of cards that contain {}:
+Here is a list of Hearthstone cards containing **{}**:
 {}
 '''
 
@@ -48,6 +48,16 @@ class HearthBot(object):
 
     def __init__(self, client):
         self.client = client
+
+    @command()
+    async def help(self):
+        '''
+        Show mod commands:
+        ```
+        @{bot_name} mod help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command()
     async def search(self, card):
