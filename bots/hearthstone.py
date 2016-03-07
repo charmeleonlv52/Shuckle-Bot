@@ -53,7 +53,7 @@ class HearthBot(object):
     @command()
     async def help(self):
         '''
-        Show mod commands:
+        Show hearth commands:
         ```
         @{bot_name} mod help
         ```
