@@ -33,7 +33,7 @@ class TwitchBot(object):
 
         self.loaded = True
 
-    @command(perm=['manage_channel'])
+    @command(perm=['manage_channels'])
     async def announce(self, frame: Frame, streamer):
         '''
         Announce, in the current channel, when somebody is streaming [U:MC]:
