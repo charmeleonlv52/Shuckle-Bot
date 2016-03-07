@@ -1,5 +1,3 @@
-from discord import Member
-
 from tokenizer import Tokenizer
 from util import get_id
 
@@ -28,14 +26,15 @@ def is_not(s):
     return s.lower() in ['not']
 
 def is_op(s):
-    op_list = [is_and, is_or, is_equal, is_contains, is_in, is_has, is_mentions]
+    op_list = [is_and, is_or, is_equal, is_contains, is_in, is_has, is_mentions, is_not]
     return any(x(s) for x in op_list)
 
 class Human(object):
-    def __init__(self, s):
+    def __init__(self, s, get_member):
         self.tokens = Tokenizer(s)
         self.queue = []
         self.wildcards = []
+        self.get_member = get_member
 
         self.parse()
 
@@ -151,6 +150,13 @@ class Human(object):
                 eval_stack.append(closure(index))
 
                 index += 1
+            elif get_id(token):
+                def closure(x):
+                    def member():
+                        return x
+                    return member
+
+                eval_stack.append(closure(get_member(get_id(token))))
             else:
                 def closure(x):
                     def literal():
@@ -180,8 +186,12 @@ class Human(object):
                 while len(stack) and not is_or(stack[-1]):
                     queue.append(stack.pop())
                 stack.append(token)
-            elif is_op(token):
+            elif is_not(token):
                 while len(stack) and not is_and(stack[-1]) and not is_or(stack[-1]):
+                    queue.append(stack.pop())
+                stack.append(token)
+            elif is_op(token):
+                while len(stack) and not is_not(stack[-1]) and not is_and(stack[-1]) and not is_or(stack[-1]):
                     queue.append(stack.pop())
                 stack.append(token)
             else:
@@ -192,8 +202,8 @@ class Human(object):
         self.queue = queue
 
 if __name__ == '__main__':
-    test = Human('author is <@1312313141341133> or car in racecar')
+    test = Human('not 1 = 1')
     print test.queue
     # print test.create_eval()
     args, func = test.create_eval()
-    print func(['<@1312313141341133>'])
+    print func([])
