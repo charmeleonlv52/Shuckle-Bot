@@ -33,7 +33,8 @@ config = {
     'owner_id': '126383697929699328',
     'secrets_path': '../secrets.json',
     # Frozen modules cannot be disabled through Module Bot.
-    'frozen_modules': ['help', 'info', 'about', 'module']
+    'frozen_modules': ['help', 'info', 'about', 'module'],
+    'mashape_key': 'uAN2N2GQYYmshZq6F4beo3U0KWVLp1b3ydQjsnHcjwFV6v0LZN'
 }
 
 # DO NOT TOUCH ANYTHING BELOW
