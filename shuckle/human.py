@@ -40,6 +40,12 @@ class Human(object):
         self.parse()
 
     def create_eval(self):
+        '''
+        Evaluates a postfix boolean expression
+        and returns a compound function that returns
+        True or False when executed depending on a list
+        of wildcards.
+        '''
         eval_stack = []
         working_queue = []
         index = 0
