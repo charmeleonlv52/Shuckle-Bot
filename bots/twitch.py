@@ -48,7 +48,7 @@ class TwitchBot(object):
             stream = Stream(streamer, frame)
 
             if not add_stream(stream):
-                raise ShuckleError('Unable to watch for stream.')
+                raise ShuckleError('Unable to add stream to watch list.')
 
             self.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
 
