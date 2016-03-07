@@ -92,7 +92,7 @@ class HearthBot(object):
                     path = '/tmp/{}.png'.format(now)
 
                     await download_file(image, path)
-                    await self.attach(path, **body)
+                    await self.attach(path, content=CARD_DISPLAY.format(**body))
 
                     try:
                         os.remove(path)
