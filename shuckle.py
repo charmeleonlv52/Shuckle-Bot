@@ -23,6 +23,7 @@ config.__SHUCKLE__ = os.path.join(config.__BASE__, 'shuckle')
 config.__BOTS__ = os.path.join(config.__BASE__, config.bots_folder)
 
 sys.path.append(config.__SHUCKLE__)
+sys.path.append(os.path.join(config.__SHUCKLE__, 'db'))
 
 if __name__ == '__main__':
     print('Starting up...')
