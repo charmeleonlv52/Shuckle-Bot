@@ -88,7 +88,7 @@ class HearthBot(object):
                     body = body[0]
                     name = body['name']
                     image = body['img']
-                    now = time()
+                    now = time.time()
                     path = '/tmp/{}.png'.format(now)
 
                     await download_file(image, path)
