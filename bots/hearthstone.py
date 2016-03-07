@@ -32,7 +32,7 @@ class HearthBot(object):
     __group__ = 'hearth'
     headers = {
         'content-type': 'application/json',
-        'X-Mashape-Key': config.mashape_ke
+        'X-Mashape-Key': config.mashape_key
     }
 
     def __init__(self, client):
