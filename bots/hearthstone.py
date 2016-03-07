@@ -42,14 +42,12 @@ class HearthBot(object):
         if len(card) < 3:
             raise ShuckleError('Please provide a longer search string.')
 
-        args = [
-            SEARCH_CARD.format(card),
-            data=json.dumps(self.payload),
-            headers=self.headers
-        ]
+        route = SEARCH_CARD.format(card)
+        payload = json.dumps(self.payload)
+        headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(*args) as resp:
+            async with session.get(route, payload=payload, headers=headers) as resp:
                 if resp.status == 404:
                     raise ShuckleError('No results found.')
                 elif resp.status == 200:
@@ -63,14 +61,12 @@ class HearthBot(object):
     async def card(self, card):
         card = ' '.join(card)
 
-        args = [
-            SINGLE_CARD.format(card),
-            data=json.dumps(self.payload),
-            headers=self.headers
-        ]
+        route = SINGLE_CARD.format(card)
+        payload = json.dumps(self.payload)
+        headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(*args) as resp:
+            async with session.get(route, payload=payload, headers=headers) as resp:
                 # This isn't an actual card. Try searching
                 # for it and returning the result.
                 if resp.status == 404:
