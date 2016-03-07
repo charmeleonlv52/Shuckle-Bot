@@ -41,6 +41,7 @@ class TwitchBot(object):
         @{bot_name} twitch announce <name>
         ```
         '''
+        streamer = ' '.join(streamer)
         if self.loaded:
             if get_stream(frame.channel.id, streamer):
                 raise ShuckleError('This streamer is already being watched.')
@@ -50,7 +51,7 @@ class TwitchBot(object):
             if not add_stream(stream):
                 raise ShuckleError('Unable to add stream to watch list.')
 
-            self.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
+            await self.say('Okay. I will make a one-time announcement when {} starts streaming.'.format(streamer))
 
         route = TWITCH_STREAM.format(streamer)
 
@@ -62,6 +63,8 @@ class TwitchBot(object):
 
                         if body['stream'] is not None:
                             await self.client.say('{} is now streaming!'.format(stream))
+                            delete_stream(frame.channel.id, streamer)
+                            break
 
             await asyncio.sleep(CHECK_DELAY)
 
