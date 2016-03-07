@@ -64,7 +64,6 @@ class HearthBot(object):
         card = ' '.join(card)
 
         route = SINGLE_CARD.format(card)
-        payload = json.dumps(self.payload)
         headers = self.headers
 
         with aiohttp.ClientSession() as session:
