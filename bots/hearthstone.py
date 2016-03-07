@@ -30,8 +30,10 @@ class HearthBot(object):
     Provides commands to show information about Hearthstone.
     '''
     __group__ = 'hearth'
-    headers = {'content-type': 'application/json'}
-    payload = {'X-Mashape-Key': config.mashape_key}
+    headers = {
+        'content-type': 'application/json',
+        'X-Mashape-Key': config.mashape_ke
+    }
 
     def __init__(self, client):
         self.client = client
@@ -44,11 +46,10 @@ class HearthBot(object):
             raise ShuckleError('Please provide a longer search string.')
 
         route = SEARCH_CARD.format(card)
-        payload = json.dumps(self.payload)
         headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(route, data=payload, headers=headers) as resp:
+            async with session.get(route, headers=headers) as resp:
                 if resp.status == 404:
                     raise ShuckleError('No results found.')
                 elif resp.status == 200:
@@ -67,7 +68,7 @@ class HearthBot(object):
         headers = self.headers
 
         with aiohttp.ClientSession() as session:
-            async with session.get(route, data=payload, headers=headers) as resp:
+            async with session.get(route, headers=headers) as resp:
                 # This isn't an actual card. Try searching
                 # for it and returning the result.
                 if resp.status == 404:
