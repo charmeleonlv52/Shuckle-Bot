@@ -6,7 +6,7 @@ import time
 from config import config
 
 from shuckle.command import command
-from shuckle.data import FileLock
+from shuckle.data import TempDownload
 from shuckle.error import ShuckleError
 from shuckle.util import gen_help
 
@@ -26,14 +26,6 @@ Here is a list of Hearthstone cards containing **{}**:
 
 SINGLE_CARD = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/{}'
 SEARCH_CARD = 'https://omgvamp-hearthstone-v1.p.mashape.com/cards/search/{}'
-
-async def download(url, path):
-    with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            dl = await resp.read()
-
-            with FileLock(path, 'wb') as f:
-                f.write(dl)
 
 class HearthBot(object):
     '''
@@ -110,18 +102,12 @@ class HearthBot(object):
                     body = body[0]
                     name = body['name']
                     image = body['img']
-                    now = time.time()
-                    path = '/tmp/{}.png'.format(now)
 
-                    await download(image, path)
+                    with TempDownload(image) as path:
+                        await download(image, path)
 
-                    with open(path, 'rb') as f:
-                        await self.client.upload(f, content=CARD_DISPLAY.strip().format(**body))
-
-                    try:
-                        os.remove(path)
-                    except:
-                        pass
+                        with open(path, 'rb') as f:
+                            await self.client.upload(f, content=CARD_DISPLAY.strip().format(**body))
                 else:
                     raise ShuckleError('Unable to get card information. Try again later.')
 
