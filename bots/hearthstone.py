@@ -1,3 +1,5 @@
+import aiohttp
+
 from config import config
 
 from shuckle.command import command
