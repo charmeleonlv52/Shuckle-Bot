@@ -1,5 +1,7 @@
+import aiohttp
 from fcntl import lockf, LOCK_EX, LOCK_UN
 import os
+import time
 
 class FileLock(object):
     '''
@@ -33,3 +35,30 @@ def read_file(path):
     '''
     with open(path, 'r') as f:
         return f.read()
+
+class TempDownload(object):
+    '''
+    A class used to download a file on entering
+    a with and then deletes it on exit.
+    '''
+    def __init__(self, url):
+        self.url = url
+        now = time.time()
+        _, ext = os.path.splitext(url)
+        self.path = '/tmp/{}.{}'.format(now, ext)
+
+    async def __aenter__(self):
+        with aiohttp.ClientSession() as session:
+            async with session.get(self.url) as resp:
+                dl = await resp.read()
+
+                with FileLock(self.path) as f:
+                    f.write(dl)
+
+                return self.path
+
+    async def __aexit__(self, *args):
+        try:
+            os.remove(self.path)
+        except:
+            pass
