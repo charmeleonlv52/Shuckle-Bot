@@ -289,11 +289,14 @@ class Toolbox(object):
     # WRAPPER FUNCTIONS
     ##################################
 
-    async def say(self, message, *args, **kwargs):
-        await self.client.send_message(get_internal('_channel'), message, *args, **kwargs)
+    async def say(self, message, channel=None, *args, **kwargs):
+        if channel is None:
+            channel = get_internal('_channel')
+
+        await self.client.send_message(channel, message, *args, **kwargs)
 
     async def tell(self, *args, **kwargs):
-        await self.client.send_message(get_internal('_author'), *args, **kwargs)
+        await self.say(*args, channel=get_internal('_author') **kwargs)
 
     async def upload(self, f, *args, **kwargs):
         await self.client.send_file(get_internal('_channel'), f, *args, **kwargs)
