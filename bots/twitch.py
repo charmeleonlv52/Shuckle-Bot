@@ -28,9 +28,10 @@ class TwitchBot(object):
 
     async def setup(self):
         streams = get_streams()
+        streams = [x.frame for x in streams]
 
         for stream in streams:
-            await self.client.exec_command(stream.frame)
+            await self.client.exec_command(stream)
 
         self.loaded = True
 
