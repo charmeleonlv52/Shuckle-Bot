@@ -1,8 +1,3 @@
-import aiohttp
-import json
-import os
-import time
-
 from config import config
 
 from shuckle.command import command
