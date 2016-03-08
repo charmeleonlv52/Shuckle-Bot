@@ -3,8 +3,9 @@ import asyncio
 
 from shuckle.command import command
 from shuckle.db.twitch import  add_stream, delete_stream, get_streams, get_stream
-from shuckle.frame import Frame
 from shuckle.error import ShuckleError
+from shuckle.frame import Frame
+from shuckle.util import gen_help
 
 TWITCH_STREAM = 'https://api.twitch.tv/kraken/streams/{}'
 CHECK_DELAY = 60 # 60 seconds not a config option because some people aren't the smartest
