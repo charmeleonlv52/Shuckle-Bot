@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from db import Model, session_factory
+from db.db import Model, session_factory
 
 class ModuleStatus(Model):
     __tablename__ = 'module_status'

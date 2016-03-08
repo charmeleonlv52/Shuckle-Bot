@@ -1,10 +1,11 @@
 import os
+import subprocess
 import sys
 
 from config import config
 
 from shuckle.command import command
-from shuckle.frame import Frame
+from shuckle.error import ShuckleError
 from shuckle.util import gen_help
 
 class ShuckleBot(object):
@@ -28,7 +29,7 @@ class ShuckleBot(object):
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(owner=True)
-    async def restart(self, frame: Frame):
+    async def restart(self):
         '''
         Restarts Shuckle:
         ```
@@ -37,5 +38,19 @@ class ShuckleBot(object):
         '''
         await self.client.say('Restarting Shuckle...')
         os.execv(os.path.join(config.__MAIN__), sys.argv)
+
+    @command(owner=True)
+    async def update(self):
+        '''
+        Pulls the latest version of Shuckle from
+        Github and restarts.
+        ```
+        @{bot_name} shuckle update
+        ```
+        '''
+
+        if not subprocess.check_output('git pull', shell=True):
+            raise ShuckleError('Unable to pull latest version from Github.')
+        await self.restart()
 
 bot = ShuckleBot

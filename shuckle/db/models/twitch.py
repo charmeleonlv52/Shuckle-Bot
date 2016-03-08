@@ -1,14 +1,14 @@
-from sqlalchemy import PickleType, Column, Integer, String
+from sqlalchemy import Column, Integer, PickleType, String
 
-from db import Model, session_factory
+from db.db import Model, session_factory
 
-class Task(Model):
-    __tablename__ = 'tasks'
+class TwitchStream(Model):
+    __tablename__ = 'twitch_streams'
 
     id = Column(Integer, primary_key=True)
     channel = Column(Integer)
-    name = Column(String)
-    task = Column(PickleType)
+    streamer = Column(String)
+    stream = Column(PickleType)
 
     def save(self):
         with session_factory() as sess:

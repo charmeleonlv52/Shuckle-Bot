@@ -3,7 +3,7 @@ from config import config
 from shuckle.command import command
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
-from shuckle.module import enable_module, disable_module, is_enabled
+from shuckle.db.module import enable_module, disable_module, is_enabled
 from shuckle.types import Module
 from shuckle.util import gen_help
 
@@ -36,7 +36,7 @@ class ModuleBot(object):
         ```
         '''
         if enable_module(frame.channel.id, module):
-            await self.client.say('The module {} has been enabled.'.format(module))
+            await self.client.say('The module **{}** has been enabled.'.format(module))
         else:
             raise ShuckleError('Unable to enable module.')
 
@@ -52,7 +52,7 @@ class ModuleBot(object):
             raise ShuckleError('You may not disable this module.')
 
         if disable_module(frame.channel.id, module):
-            await self.client.say('The module {} has been disabled.'.format(module))
+            await self.client.say('The module **{}** has been disabled.'.format(module))
         else:
             raise ShuckleError('Unable to disable module.')
 

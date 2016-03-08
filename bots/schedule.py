@@ -7,12 +7,11 @@ import os
 from config import config
 
 from shuckle.command import command
-from shuckle.data import FileLock
 from shuckle.error import ShuckleError
 from shuckle.frame import Frame
-from shuckle.schedule import load_schedule, add_task, delete_task, get_task, list_tasks
+from shuckle.db.schedule import load_schedule, add_task, delete_task, get_task, list_tasks
 from shuckle.types import Timespan
-from shuckle.util import gen_help, flatten
+from shuckle.util import gen_help
 
 class Task(object):
     def __init__(self, name, command, frame):
@@ -76,7 +75,7 @@ class ScheduleBot(object):
         if not delete_task(frame.channel.id, task):
             raise ShuckleError('This task does not exist.')
 
-        await self.client.say('The task "{}" has been unscheduled.'.format(task))
+        await self.client.say('The task **{}** has been unscheduled.'.format(task))
 
     @command(perm=['manage_messages', 'manage_channels'])
     async def add(self, frame: Frame, name: str, delay: Timespan, command):
@@ -108,7 +107,7 @@ class ScheduleBot(object):
                 raise ShuckleError('Unable to schedule task.')
 
             await self.client.say(
-                'The task "{}" has been scheduled to be run every {}.'.format(
+                'Okay. I will run the task **{}** every {}.'.format(
                     name, format_timespan(delay)
                 )
             )
