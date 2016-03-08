@@ -53,5 +53,4 @@ class ShuckleBot(object):
             raise ShuckleError('Unable to pull latest version from Github.')
         await self.restart()
 
-
 bot = ShuckleBot
