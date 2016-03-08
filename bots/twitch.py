@@ -16,6 +16,10 @@ class Stream(object):
         self.frame = frame
 
 class TwitchBot(object):
+    '''
+    **Twitch Bot**
+    Provides commands for notifying when a Twitch streamer is online.
+    '''
     __group__ = 'twitch'
     headers = {
         'content-type': 'application/json'
@@ -34,6 +38,16 @@ class TwitchBot(object):
             await self.client.exec_command(stream)
 
         self.loaded = True
+
+    @command()
+    async def help(self):
+        '''
+        Show twitch commands:
+        ```
+        @{bot_name} twitch help
+        ```
+        '''
+        await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
 
     @command(perm=['manage_channels'])
     async def announce(self, frame: Frame, streamer):
