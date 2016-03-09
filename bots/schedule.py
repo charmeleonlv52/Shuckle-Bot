@@ -122,6 +122,6 @@ class ScheduleBot(object):
                 traceback.print_exc()
 
         loop = asyncio.get_event_loop()
-        loop.ensure_future(do_task())
+        aasync.ensure_future(do_task())
 
 bot = ScheduleBot
