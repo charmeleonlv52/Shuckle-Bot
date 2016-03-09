@@ -106,7 +106,7 @@ class PollBot(object):
         ```
         Shorthand for the above [B:AF]:
         ```
-        @{bot_name} poll make <title> <duration> <option> [<option>]
+        @{bot_name} poll start <title> <duration> <option> [<option>]
         ```
         '''
         # Only one poll per channel
