@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import traceback
 
 from shuckle.command import command
 from shuckle.db.twitch import  add_stream, delete_stream, get_streams, get_stream
@@ -72,17 +73,24 @@ class TwitchBot(object):
 
         route = TWITCH_STREAM.format(streamer)
 
-        while True:
-            with aiohttp.ClientSession() as session:
-                async with session.get(route, headers=self.headers) as resp:
-                    if resp.status == 200:
-                        body = await resp.json()
+        async def do_task():
+            while True:
+                try:
+                    with aiohttp.ClientSession() as session:
+                        async with session.get(route, headers=self.headers) as resp:
+                            if resp.status == 200:
+                                body = await resp.json()
 
-                        if body['stream'] is not None:
-                            await self.client.say('**{}** is now streaming!'.format(streamer))
-                            delete_stream(frame.channel.id, streamer)
-                            break
+                                if body['stream'] is not None:
+                                    await self.client.say('**{}** is now streaming!'.format(streamer))
+                                    delete_stream(frame.channel.id, streamer)
+                                    break
 
-            await asyncio.sleep(CHECK_DELAY)
+                    await asyncio.sleep(CHECK_DELAY)
+                except:
+                    traceback.print_exc()
+
+        loop = asyncio.get_event_loop()
+        loop.ensure_future(do_task())
 
 bot = TwitchBot

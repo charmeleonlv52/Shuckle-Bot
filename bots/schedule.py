@@ -3,6 +3,7 @@ import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
 import os
+improt traceback
 
 from config import config
 
@@ -112,11 +113,15 @@ class ScheduleBot(object):
                 )
             )
 
-        try:
-            while get_task(frame.channel.id, name):
-                await self.client.exec_command(frame)
-                await asyncio.sleep(delay)
-        except:
-            pass
+        async def do_task():
+            try:
+                while get_task(frame.channel.id, name):
+                    await self.client.exec_command(frame)
+                    await asyncio.sleep(delay)
+            except:
+                traceback.print_exc()
+
+        loop = asyncio.get_event_loop()
+        loop.ensure_future(do_task())
 
 bot = ScheduleBot
