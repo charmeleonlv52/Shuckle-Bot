@@ -3,7 +3,7 @@ import copy
 from discord.errors import InvalidArgument
 from humanfriendly import format_timespan
 import os
-improt traceback
+import traceback
 
 from config import config
 
