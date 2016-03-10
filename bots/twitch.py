@@ -82,7 +82,7 @@ class TwitchBot(object):
                                 body = await resp.json()
 
                                 if body['stream'] is not None:
-                                    await self.client.say('**{}** is now streaming!'.format(streamer))
+                                    await self.client.say('**{}** is now streaming!'.format(streamer), channel=frame.channel)
                                     delete_stream(frame.channel.id, streamer)
                                     break
 
