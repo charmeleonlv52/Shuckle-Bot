@@ -183,6 +183,8 @@ class Toolbox(object):
                     args.append(frame)
                 else:
                     args.append(tokens.swallow())
+        except ValueError:
+            args.append(tokens.swallow())
         except:
             # Typically we will want to swallow
             # _gen_arg errors because it means an invalid
@@ -207,8 +209,16 @@ class Toolbox(object):
         _author = frame.author
 
         tokens = Tokenizer(frame.message)
-        group = tokens.next()
-        cmd = tokens.next()
+
+        try:
+            group = tokens.next()
+        except:
+            group = tokens.swallow()
+
+        try:
+            cmd = tokens.next()
+        except:
+            cmd = tokens.swallow()
 
         # Module not enabled for given channel.
         if not is_enabled(frame.channel.id, group):
@@ -243,6 +253,8 @@ class Toolbox(object):
             except IndexError:
                 pass
             except KeyError:
+                pass
+            except TypeError:
                 pass
             except ShuckleError as e:
                 if self.__DEBUG__: traceback.print_exc()
