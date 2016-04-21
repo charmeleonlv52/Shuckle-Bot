@@ -34,4 +34,4 @@ if __name__ == '__main__':
 
     client = Toolbox(debug=__DEBUG__)
 
-    client.run(secrets.email, secrets.password)
+    client.run(secrets.token)
