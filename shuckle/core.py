@@ -113,7 +113,7 @@ class Toolbox(object):
 
         self.commands = {}
 
-    def run(self, email, password):
+    def run(self, token):
         try:
             self._load_bots()
         except:
@@ -126,7 +126,7 @@ class Toolbox(object):
 
         print('Shuckle is starting...')
 
-        self.client.run(email, password)
+        self.client.run(token)
 
     def remove_prefix(self, message):
         '''
