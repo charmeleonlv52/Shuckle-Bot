@@ -33,7 +33,8 @@ class Toolbox(object):
         self.core = {
             'help': self.help,
             'info': self.help,
-            'about': self.help
+            'about': self.help,
+            'invite': self.invite
         }
 
         self.client.on_ready = self.on_ready
@@ -287,15 +288,6 @@ class Toolbox(object):
         if message.author == self.user:
             return
 
-        if message.channel.is_private:
-            # Assume whatever was received is a server invite
-            # and attempt to join it.
-            try:
-                invite = await self.client.get_invite(message.clean_content.strip())
-                await self.client.accept_invite(invite)
-            except:
-                return
-
         if self.remove_prefix(message):
             await self.exec_command(Frame(message))
 
@@ -310,7 +302,7 @@ class Toolbox(object):
         await self.client.send_message(channel, message, *args, **kwargs)
 
     async def tell(self, *args, **kwargs):
-        await self.say(*args, channel=get_internal('_author') **kwargs)
+        await self.say(*args, channel=get_internal('_author'), **kwargs)
 
     async def upload(self, f, *args, **kwargs):
         await self.client.send_file(get_internal('_channel'), f, *args, **kwargs)
@@ -329,6 +321,9 @@ class Toolbox(object):
     ##################################
     # CORE COMMANDS
     ##################################
+
+    async def invite(self):
+        await self.tell('Authorize me at the following URL: https://discordapp.com/oauth2/authorize?&client_id=173665672629452800&scope=bot&permissions=0')
 
     async def help(self):
         '''
