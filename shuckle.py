@@ -28,7 +28,6 @@ sys.path.append(os.path.join(config.__SHUCKLE__, 'db'))
 if __name__ == '__main__':
     print('Starting up...')
     print('Debug status: {}'.format(__DEBUG__))
-    print('Using user: ' + secrets.email)
 
     from shuckle.core import Toolbox
 

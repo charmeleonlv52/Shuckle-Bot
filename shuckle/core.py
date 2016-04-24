@@ -282,6 +282,8 @@ class Toolbox(object):
 
     # on_message event handler
     async def on_message(self, message):
+        if self.user is None:
+            return
         if message.author == self.user:
             return
 
