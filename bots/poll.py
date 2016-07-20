@@ -155,7 +155,7 @@ class PollBot(object):
                 except:
                     pass
             else:
-                await self.client.say('**POLL: {}** - No Results'.format(data['title']))
+                await self.client.say('**POLL: {}** - No Results'.format(title))
 
             # Delete current poll to allow a new one
             del self.polls[frame.channel]
