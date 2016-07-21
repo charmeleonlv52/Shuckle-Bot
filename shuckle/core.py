@@ -310,6 +310,12 @@ class Toolbox(object):
     def get_history(self, **kwargs):
         return self.client.logs_from(get_internal('_channel'), **kwargs)
 
+    async def purge_from(self, *args, **kwargs):
+        await self.client.purge_from(*args, **kwargs)
+
+    async def purge(self, check=lambda x: True, **kwargs):
+        await self.client.purge_from(get_internal('_channel'), check=check, **kwargs)
+
     @property
     def author(self):
         return get_internal('_author')
