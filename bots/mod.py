@@ -52,18 +52,12 @@ class ModBot(object):
         @{bot_name} mod prune <@user>
         ```
         '''
-        await self.prune_channel(
-            func=lambda x: x.author==member
-        )
+        await self.prune_channel(lambda x: x.author==member)
 
     # Deletes all previous messages in a specified
     # channel.
-    async def prune_channel(self, func=None):
-        history = self.client.get_history(limit=MAX_INT)
-
-        async for x in history:
-            if func is None or func(x):
-                await self.client.delete(x)
+    async def prune_channel(self, func=lambda x: True):
+        await self.client.purge_from(self.client.channel, MAX_INT, check=func)
 
     # Archives an entire channel to a text file
     # and sends it to the calling user.

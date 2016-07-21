@@ -311,6 +311,14 @@ class Toolbox(object):
         return self.client.logs_from(get_internal('_channel'), **kwargs)
 
     @property
+    def author(self):
+        return get_internal('_author')
+
+    @property
+    def channel(self):
+        return get_internal('_channel')
+
+    @property
     def uptime(self):
         return humanfriendly.format_timespan(time() - self.start_time, detailed=False)
 

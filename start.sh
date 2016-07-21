@@ -1,1 +1,1 @@
-python3.5 shuckle.py || python shuckle.py
+python3 shuckle.py || python shuckle.py

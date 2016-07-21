@@ -14,7 +14,7 @@ config = {
 
         Want module specific information? Use: `@{bot_name} <module> help`
         Want to see the permission glossery? Use: `@{bot_name} help|about|info permissions`
-        Want to use {bot_name} on your own server? PM {bot_name} anything for an auth URL.
+        Want to use {bot_name} on your own server? Use: `@{bot_name} invite`
         """,
     'permissions':
         """
