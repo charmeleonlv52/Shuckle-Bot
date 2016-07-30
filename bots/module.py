@@ -22,7 +22,7 @@ class ModuleBot(object):
         '''
         Shows module commands:
         ```
-        @{bot_name} poll help
+        @{bot_name} module help
         ```
         '''
         await self.client.say(gen_help(self).format(bot_name=self.client.user.name))
